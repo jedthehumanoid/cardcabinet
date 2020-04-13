@@ -86,3 +86,26 @@ func MarshalFrontmatter(card Card) string {
 
 	return ret
 }
+
+func FilterLabels(cards []Card, labels []string) []Card {
+	ret := []Card{}
+	for _, card := range cards {
+		l := asStringSlice(card.Properties["labels"])
+		if ContainsStrings(l, labels) {
+			ret = append(ret, card)
+		}
+	}
+	return ret
+}
+
+func GetLabels(cards []Card) []string {
+	labels := []string{}
+	for _, card := range cards {
+		for _, label := range asStringSlice(card.Properties["labels"]) {
+			if !ContainsString(labels, label) {
+				labels = append(labels, label)
+			}
+		}
+	}
+	return labels
+}

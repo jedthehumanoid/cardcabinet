@@ -46,3 +46,33 @@ func ToSlug(s string) string {
 	s = re.ReplaceAllString(s, "-")
 	return strings.Trim(s, "-")
 }
+
+func asStringSlice(i interface{}) []string {
+	ret := []string{}
+	if i == nil {
+		return ret
+	}
+	for _, v := range i.([]interface{}) {
+		ret = append(ret, v.(string))
+	}
+	return ret
+}
+
+// ContainsString searches slice for string
+func ContainsString(list []string, s string) bool {
+	for _, val := range list {
+		if val == s {
+			return true
+		}
+	}
+	return false
+}
+
+func ContainsStrings(list []string, ss []string) bool {
+	for _, s := range ss {
+		if !ContainsString(list, s) {
+			return false
+		}
+	}
+	return true
+}
