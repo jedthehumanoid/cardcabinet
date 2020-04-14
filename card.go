@@ -17,6 +17,48 @@ type Card struct {
 	Frontmatter string                 `json:"frontmatter,omitempty"`
 }
 
+func ReadDir(dir string) ([]Card, []Board) {
+	cards := ReadCards(dir)
+	boards := ReadBoards(dir)
+
+	boards = append(boards, getLabels(cards)...)
+
+	deck := Deck{}
+	for _, card := range cards {
+		deck.Cards = append(deck.Cards, card.Title)
+	}
+
+	board := Board{}
+	board.Decks = append(board.Decks, deck)
+	boards = append(boards, board)
+	for i, board := range boards {
+		for i, deck := range board.Decks {
+			if len(deck.Labels) > 0 {
+				deck.Cards = FilterLabels(cards, deck.Labels)
+			}
+			board.Decks[i] = deck
+		}
+		boards[i] = board
+	}
+	return cards, boards
+}
+
+func getLabels(cards []Card) []Board {
+	boards := []Board{}
+	for _, label := range GetLabels(cards) {
+		deck := Deck{}
+		deck.Title = label
+		deck.Labels = []string{label}
+
+		board := Board{}
+		board.Title = "+" + label
+		board.Decks = append(board.Decks, deck)
+
+		boards = append(boards, board)
+	}
+	return boards
+}
+
 // ReadCardFile takes a file path, reading file in to a card.
 func ReadCard(path string) (Card, error) {
 	var card Card
@@ -93,12 +135,12 @@ func MarshalFrontmatter(card Card, fences bool) string {
 	return ret
 }
 
-func FilterLabels(cards []Card, labels []string) []Card {
-	ret := []Card{}
+func FilterLabels(cards []Card, labels []string) []string {
+	ret := []string{}
 	for _, card := range cards {
 		l := asStringSlice(card.Properties["labels"])
 		if ContainsStrings(l, labels) {
-			ret = append(ret, card)
+			ret = append(ret, card.Title)
 		}
 	}
 	return ret

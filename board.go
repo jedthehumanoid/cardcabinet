@@ -15,7 +15,7 @@ type Board struct {
 type Deck struct {
 	Title  string   `toml:"title" json:"title"`
 	Labels []string `toml:"labels" json:"labels"`
-	Cards  []Card   `toml:"cards" json:"cards"`
+	Cards  []string `toml:"cards" json:"cards"`
 }
 
 func IsBoard(file string) bool {
