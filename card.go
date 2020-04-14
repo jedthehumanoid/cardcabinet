@@ -65,7 +65,7 @@ func ReadCards(dir string) []Card {
 	return cards
 }
 
-func MarshalFrontmatter(card Card) string {
+func MarshalFrontmatter(card Card, fences bool) string {
 	ret := ""
 
 	switch card.Frontmatter {
@@ -73,14 +73,20 @@ func MarshalFrontmatter(card Card) string {
 		b, _ := yaml.Marshal(card.Properties)
 		frontmatter := strings.TrimSpace(string(b))
 		if frontmatter != "{}" {
-			ret = "---\n" + frontmatter + "\n---"
+			ret = frontmatter
+			if fences {
+				ret = "---\n" + ret + "\n---"
+			}
 		}
 	case "toml":
 		buf := new(bytes.Buffer)
 		toml.NewEncoder(buf).Encode(card.Properties)
 		frontmatter := strings.TrimSpace(buf.String())
 		if frontmatter != "" {
-			ret = "+++\n" + frontmatter + "\n+++"
+			ret = frontmatter
+			if fences {
+				ret = "+++\n" + ret + "\n+++"
+			}
 		}
 	}
 
