@@ -55,3 +55,12 @@ func ReadBoard(path string) (Board, error) {
 
 	return board, err
 }
+
+func GetBoard(boards []Board, board string) Board {
+	for _, b := range boards {
+		if b.Title == board {
+			return b
+		}
+	}
+	return Board{}
+}
