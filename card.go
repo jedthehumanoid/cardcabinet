@@ -22,7 +22,7 @@ func ReadDir(dir string) ([]Card, []Board) {
 	boards := ReadBoards(dir)
 
 	boards = append(boards, getLabels(cards)...)
-
+	boards = append(boards, getFolders(cards)...)
 	deck := Deck{}
 	for _, card := range cards {
 		deck.Cards = append(deck.Cards, card.Title)
@@ -35,6 +35,9 @@ func ReadDir(dir string) ([]Card, []Board) {
 		for i, deck := range board.Decks {
 			if len(deck.Labels) > 0 {
 				deck.Cards = FilterLabels(cards, deck.Labels)
+			}
+			if deck.Path != "" {
+				deck.Cards = filterPath(cards, deck.Path)
 			}
 			board.Decks[i] = deck
 		}
@@ -56,6 +59,33 @@ func getLabels(cards []Card) []Board {
 
 		boards = append(boards, board)
 	}
+	return boards
+}
+
+func getFolders(cards []Card) []Board {
+	boards := []Board{}
+	folders := []string{}
+
+	for _, card := range cards {
+		tokens := strings.Split(card.Title, "/")
+		folder := strings.Join(tokens[:len(tokens)-1], "/")
+		if folder != "" && !ContainsString(folders, folder) {
+			folders = append(folders, folder)
+		}
+	}
+
+	for _, folder := range folders {
+		deck := Deck{}
+		deck.Title = folder
+		deck.Path = folder
+
+		board := Board{}
+		board.Title = "/" + folder
+		board.Decks = append(board.Decks, deck)
+
+		boards = append(boards, board)
+	}
+
 	return boards
 }
 
@@ -140,6 +170,16 @@ func FilterLabels(cards []Card, labels []string) []string {
 	for _, card := range cards {
 		l := asStringSlice(card.Properties["labels"])
 		if ContainsStrings(l, labels) {
+			ret = append(ret, card.Title)
+		}
+	}
+	return ret
+}
+
+func filterPath(cards []Card, p string) []string {
+	ret := []string{}
+	for _, card := range cards {
+		if strings.HasPrefix(card.Title, p) {
 			ret = append(ret, card.Title)
 		}
 	}

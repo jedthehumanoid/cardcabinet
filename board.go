@@ -15,6 +15,7 @@ type Board struct {
 type Deck struct {
 	Title  string   `toml:"title" json:"title"`
 	Labels []string `toml:"labels" json:"labels"`
+	Path   string   `toml:"path" json:"path"`
 	Cards  []string `toml:"cards" json:"cards"`
 }
 
