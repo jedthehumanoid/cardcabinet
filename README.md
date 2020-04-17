@@ -11,4 +11,4 @@ The intention is use this in different projects, for example a simple kanban-sty
 
 ## Non goals
 
-Card cabinet is **not** a system where notes can reference each other in a infinite hierarchy like [Org mode](https://orgmode.org) or [Roam](https://roamresearch.com). The idea here is to actually simplify and remove relationships from cards themselves. 
+Card cabinet is **not** a magical system where notes can reference each other in a infinite hierarchy like [Org mode](https://orgmode.org) or [Roam](https://roamresearch.com). The idea here is to actually simplify and remove relationships from cards themselves. 
