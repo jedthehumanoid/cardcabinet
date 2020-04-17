@@ -19,8 +19,11 @@ type Card struct {
 }
 
 func ReadDir(dir string) ([]Card, []Board) {
-	cards := ReadCards(dir)
-	boards := ReadBoards(dir)
+
+	files := findFiles(dir)
+
+	cards := ReadCards(files)
+	boards := ReadBoards(files)
 
 	boards = append(boards, getLabels(cards)...)
 	boards = append(boards, getFolders(cards)...)
@@ -139,10 +142,10 @@ func IsCard(file string) bool {
 	return strings.HasSuffix(file, ".md")
 }
 
-func ReadCards(dir string) []Card {
+func ReadCards(files []string) []Card {
 	cards := []Card{}
 
-	for _, file := range findFiles(dir) {
+	for _, file := range files {
 		if !IsCard(file) {
 			continue
 		}
@@ -150,7 +153,6 @@ func ReadCards(dir string) []Card {
 		if err != nil {
 			panic(err)
 		}
-		card.Title = strings.TrimPrefix(card.Title, dir)
 		cards = append(cards, card)
 	}
 	return cards

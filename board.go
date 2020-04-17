@@ -23,10 +23,10 @@ func IsBoard(file string) bool {
 	return strings.HasSuffix(file, ".board.toml")
 }
 
-func ReadBoards(dir string) []Board {
+func ReadBoards(files []string) []Board {
 	boards := []Board{}
 
-	for _, file := range findFiles(dir) {
+	for _, file := range files {
 		if !IsBoard(file) {
 			continue
 		}
@@ -35,7 +35,6 @@ func ReadBoards(dir string) []Board {
 		if err != nil {
 			panic(err)
 		}
-		board.Title = strings.TrimPrefix(board.Title, dir)
 		boards = append(boards, board)
 	}
 
