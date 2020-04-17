@@ -7,7 +7,7 @@ Card cabinet is a simple system of markdown files with properties in frontmatter
 The cards (files) are fairly stand alone, leaving the boards to link or structure cards based on labels or other 
 properties.
 
-The intention is use thiis in different projects, for example a simple kanban-style issue tracker.
+The intention is use this in different projects, for example a simple kanban-style issue tracker.
 
 ## Non goals
 
