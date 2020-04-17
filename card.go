@@ -25,18 +25,32 @@ func ReadDir(dir string) ([]Card, []Board) {
 	cards := ReadCards(files)
 	boards := ReadBoards(files)
 
+	for i, _ := range cards {
+		cards[i].Title = strings.TrimPrefix(cards[i].Title, dir)
+	}
+
+	for i, _ := range boards {
+		boards[i].Title = strings.TrimPrefix(boards[i].Title, dir)
+	}
+
 	boards = append(boards, getLabels(cards)...)
 	boards = append(boards, getFolders(cards)...)
+
+	// Add nameless board for all the cards
 	deck := Deck{}
 	for _, card := range cards {
 		deck.Cards = append(deck.Cards, card.Title)
 	}
 
-	// Add nameless board for all the cards
 	board := Board{}
 	board.Decks = append(board.Decks, deck)
 	boards = append(boards, board)
 
+	boards = refreshBoards(cards, boards)
+	return cards, boards
+}
+
+func refreshBoards(cards []Card, boards []Board) []Board {
 	for i, board := range boards {
 		for i, deck := range board.Decks {
 			if len(deck.Labels) > 0 {
@@ -47,7 +61,7 @@ func ReadDir(dir string) ([]Card, []Board) {
 		}
 		boards[i] = board
 	}
-	return cards, boards
+	return boards
 }
 
 func getLabels(cards []Card) []Board {
