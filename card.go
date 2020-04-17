@@ -2,6 +2,7 @@ package cardcabinet
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/BurntSushi/toml"
 	yaml "gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -28,17 +29,17 @@ func ReadDir(dir string) ([]Card, []Board) {
 		deck.Cards = append(deck.Cards, card.Title)
 	}
 
+	// Add nameless board for all the cards
 	board := Board{}
 	board.Decks = append(board.Decks, deck)
 	boards = append(boards, board)
+
 	for i, board := range boards {
 		for i, deck := range board.Decks {
 			if len(deck.Labels) > 0 {
-				deck.Cards = FilterLabels(cards, deck.Labels)
+				deck.Cards = filterLabels(cards, deck.Labels)
 			}
-			if deck.Path != "" {
-				deck.Cards = filterPath(cards, deck.Path)
-			}
+			deck.Cards = filterPath(deck.Cards, board.Title)
 			board.Decks[i] = deck
 		}
 		boards[i] = board
@@ -48,7 +49,17 @@ func ReadDir(dir string) ([]Card, []Board) {
 
 func getLabels(cards []Card) []Board {
 	boards := []Board{}
-	for _, label := range GetLabels(cards) {
+	labels := []string{}
+
+	for _, card := range cards {
+		for _, label := range asStringSlice(card.Properties["labels"]) {
+			if !ContainsString(labels, label) {
+				labels = append(labels, label)
+			}
+		}
+	}
+
+	for _, label := range labels {
 		deck := Deck{}
 		deck.Title = label
 		deck.Labels = []string{label}
@@ -62,14 +73,22 @@ func getLabels(cards []Card) []Board {
 	return boards
 }
 
+func GetCard(cards []Card, title string) (Card, error) {
+	for _, card := range cards {
+		if card.Title == title {
+			return card, nil
+		}
+	}
+	return Card{}, fmt.Errorf("Cannot find %s", title)
+}
+
 func getFolders(cards []Card) []Board {
 	boards := []Board{}
 	folders := []string{}
 
 	for _, card := range cards {
-		tokens := strings.Split(card.Title, "/")
-		folder := strings.Join(tokens[:len(tokens)-1], "/")
-		if folder != "" && !ContainsString(folders, folder) {
+		folder := filepath.Dir(card.Title)
+		if folder != "." && !ContainsString(folders, folder) {
 			folders = append(folders, folder)
 		}
 	}
@@ -80,7 +99,7 @@ func getFolders(cards []Card) []Board {
 		deck.Path = folder
 
 		board := Board{}
-		board.Title = "/" + folder
+		board.Title = "/" + folder + "/"
 		board.Decks = append(board.Decks, deck)
 
 		boards = append(boards, board)
@@ -165,7 +184,7 @@ func MarshalFrontmatter(card Card, fences bool) string {
 	return ret
 }
 
-func FilterLabels(cards []Card, labels []string) []string {
+func filterLabels(cards []Card, labels []string) []string {
 	ret := []string{}
 	for _, card := range cards {
 		l := asStringSlice(card.Properties["labels"])
@@ -176,24 +195,17 @@ func FilterLabels(cards []Card, labels []string) []string {
 	return ret
 }
 
-func filterPath(cards []Card, p string) []string {
+func filterPath(cards []string, p string) []string {
 	ret := []string{}
+
+	p = filepath.Dir(p)
+	p = strings.TrimPrefix(p, "/")
+	p = strings.TrimPrefix(p, ".")
+
 	for _, card := range cards {
-		if strings.HasPrefix(card.Title, p) {
-			ret = append(ret, card.Title)
+		if strings.HasPrefix(card, p) {
+			ret = append(ret, card)
 		}
 	}
 	return ret
-}
-
-func GetLabels(cards []Card) []string {
-	labels := []string{}
-	for _, card := range cards {
-		for _, label := range asStringSlice(card.Properties["labels"]) {
-			if !ContainsString(labels, label) {
-				labels = append(labels, label)
-			}
-		}
-	}
-	return labels
 }
