@@ -12,7 +12,7 @@ import (
 )
 
 // FindFiles is like find
-func findFiles(path string) []string {
+func FindFiles(path string) []string {
 	files := []string{}
 	filepath.Walk(path,
 		func(file string, f os.FileInfo, err error) error {
@@ -25,6 +25,15 @@ func findFiles(path string) []string {
 			return nil
 		})
 	return files
+}
+
+func GetPath(title string) string {
+	ret := filepath.Dir(title)
+	ret = strings.TrimPrefix(ret, ".")
+	if ret != "" {
+		ret = ret + "/"
+	}
+	return ret
 }
 
 // FromSlug returns "this format" from "this-format"

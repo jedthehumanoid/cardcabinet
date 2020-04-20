@@ -15,8 +15,17 @@ type Board struct {
 type Deck struct {
 	Title  string   `toml:"title" json:"title"`
 	Labels []string `toml:"labels" json:"labels"`
-	Path   string   `toml:"path" json:"path"`
 	Cards  []string `toml:"cards" json:"cards"`
+}
+
+func GetCards(cards []Card, board Board) []Deck {
+	ret := []string{}
+
+	ret = deck.Cards
+	if len(deck.Labels) > 0 {
+		ret = filterLabels(cards, deck.Labels)
+	}
+	return ret
 }
 
 func IsBoard(file string) bool {
