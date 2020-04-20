@@ -9,23 +9,22 @@ import (
 
 type Board struct {
 	Title string `toml:"title" json:"title"`
-	Decks []Deck `toml:"decks" json:"decks"`
+	Decks []struct {
+		Title  string   `toml:"title" json:"title"`
+		Labels []string `toml:"labels" json:"labels"`
+		Cards  []string `toml:"cards" json:"cards"`
+	} `toml:"decks" json:"decks"`
 }
 
-type Deck struct {
-	Title  string   `toml:"title" json:"title"`
-	Labels []string `toml:"labels" json:"labels"`
-	Cards  []string `toml:"cards" json:"cards"`
-}
-
-func GetCards(cards []Card, board Board) []Deck {
-	ret := []string{}
-
-	ret = deck.Cards
-	if len(deck.Labels) > 0 {
-		ret = filterLabels(cards, deck.Labels)
+func (board Board) Get(cards []Card) Board {
+	for i, deck := range board.Decks {
+		if len(deck.Labels) > 0 {
+			board.Decks[i].Cards = filterLabels(cards, deck.Labels)
+		}
+		// TODO: filter by path here...
 	}
-	return ret
+
+	return board
 }
 
 func IsBoard(file string) bool {
