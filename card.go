@@ -90,7 +90,7 @@ func isCard(file string) bool {
 func ReadCard(path string) (Card, error) {
 	var card Card
 
-	card.Title = ToSlug(strings.TrimSuffix(path, ".md")) + ".md"
+	//card.Title = ToSlug(strings.TrimSuffix(path, ".md")) + ".md"
 
 	contents, err := ioutil.ReadFile(filepath.FromSlash(path))
 	if err != nil {
