@@ -91,7 +91,7 @@ func ReadCard(path string) (Card, error) {
 	var card Card
 
 	//card.Title = ToSlug(strings.TrimSuffix(path, ".md")) + ".md"
-
+	card.Title = path
 	contents, err := ioutil.ReadFile(filepath.FromSlash(path))
 	if err != nil {
 		return card, err
