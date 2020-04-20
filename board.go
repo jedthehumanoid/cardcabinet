@@ -17,7 +17,13 @@ type Board struct {
 }
 
 func (board Board) Get(cards []Card) Board {
+
+	boarddir := GetPath(board.Title)
+
 	for i, deck := range board.Decks {
+		for j, card := range deck.Cards {
+			deck.Cards[j] = boarddir + card
+		}
 		if len(deck.Labels) > 0 {
 			board.Decks[i].Cards = filterLabels(cards, deck.Labels)
 		}
