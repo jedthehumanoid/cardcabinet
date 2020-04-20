@@ -9,11 +9,13 @@ import (
 
 type Board struct {
 	Title string `toml:"title" json:"title"`
-	Decks []struct {
-		Title  string   `toml:"title" json:"title"`
-		Labels []string `toml:"labels" json:"labels"`
-		Cards  []string `toml:"cards" json:"cards"`
-	} `toml:"decks" json:"decks"`
+	Decks []Deck `toml:"decks" json:"decks"`
+}
+
+type Deck struct {
+	Title  string   `toml:"title" json:"title"`
+	Labels []string `toml:"labels" json:"labels"`
+	Cards  []string `toml:"cards" json:"cards"`
 }
 
 func (board Board) Get(cards []Card) Board {

@@ -18,6 +18,34 @@ type Card struct {
 	Frontmatter string                 `json:"frontmatter,omitempty"`
 }
 
+func (card Card) MarshalFrontmatter(fences bool) string {
+	ret := ""
+
+	switch card.Frontmatter {
+	case "yaml":
+		b, _ := yaml.Marshal(card.Properties)
+		frontmatter := strings.TrimSpace(string(b))
+		if frontmatter != "{}" {
+			ret = frontmatter
+			if fences {
+				ret = "---\n" + ret + "\n---"
+			}
+		}
+	case "toml":
+		buf := new(bytes.Buffer)
+		toml.NewEncoder(buf).Encode(card.Properties)
+		frontmatter := strings.TrimSpace(buf.String())
+		if frontmatter != "" {
+			ret = frontmatter
+			if fences {
+				ret = "+++\n" + ret + "\n+++"
+			}
+		}
+	}
+
+	return ret
+}
+
 func GetLabels(cards []Card) []string {
 	labels := []string{}
 
@@ -99,34 +127,6 @@ func ReadCards(files []string) []Card {
 		cards = append(cards, card)
 	}
 	return cards
-}
-
-func MarshalFrontmatter(card Card, fences bool) string {
-	ret := ""
-
-	switch card.Frontmatter {
-	case "yaml":
-		b, _ := yaml.Marshal(card.Properties)
-		frontmatter := strings.TrimSpace(string(b))
-		if frontmatter != "{}" {
-			ret = frontmatter
-			if fences {
-				ret = "---\n" + ret + "\n---"
-			}
-		}
-	case "toml":
-		buf := new(bytes.Buffer)
-		toml.NewEncoder(buf).Encode(card.Properties)
-		frontmatter := strings.TrimSpace(buf.String())
-		if frontmatter != "" {
-			ret = frontmatter
-			if fences {
-				ret = "+++\n" + ret + "\n+++"
-			}
-		}
-	}
-
-	return ret
 }
 
 func filterLabels(cards []Card, labels []string) []string {
