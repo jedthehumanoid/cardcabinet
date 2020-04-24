@@ -26,10 +26,18 @@ func (board Board) Get(cards []Card) Board {
 		for j, card := range deck.Cards {
 			deck.Cards[j] = boarddir + card
 		}
-		if len(deck.Labels) > 0 {
-			board.Decks[i].Cards = filterLabels(cards, deck.Labels)
-		}
+		//		if len(deck.Labels) > 0 {
+		board.Decks[i].Cards = filterLabels(cards, deck.Labels)
+		//}
 		// TODO: filter by path here...
+		temp := []string{}
+		for _, card := range board.Decks[i].Cards {
+			//fmt.Println(card, filepath.Dir(board.Title))
+			if strings.HasPrefix(card, boarddir) {
+				temp = append(temp, card)
+			}
+		}
+		board.Decks[i].Cards = temp
 	}
 
 	return board
