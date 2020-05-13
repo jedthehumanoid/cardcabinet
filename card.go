@@ -12,7 +12,7 @@ import (
 
 // Card is markdown with properties (from frontmatter).
 type Card struct {
-	Title       string                 `json:"title"`
+	Name        string                 `json:"name"`
 	Contents    string                 `json:"contents"`
 	Properties  map[string]interface{} `json:"properties,omitempty"`
 	Frontmatter string                 `json:"frontmatter,omitempty"`
@@ -64,7 +64,7 @@ func GetFolders(cards []Card) []string {
 	folders := []string{}
 
 	for _, card := range cards {
-		folder := filepath.Dir(card.Title)
+		folder := filepath.Dir(card.Name)
 		if folder != "." && !ContainsString(folders, folder) {
 			folders = append(folders, folder)
 		}
@@ -73,13 +73,13 @@ func GetFolders(cards []Card) []string {
 	return folders
 }
 
-func GetCard(cards []Card, title string) (Card, error) {
+func GetCard(cards []Card, name string) (Card, error) {
 	for _, card := range cards {
-		if card.Title == title {
+		if card.Name == name {
 			return card, nil
 		}
 	}
-	return Card{}, fmt.Errorf("Cannot find %s", title)
+	return Card{}, fmt.Errorf("Cannot find %s", name)
 }
 
 func isCard(file string) bool {
@@ -90,8 +90,7 @@ func isCard(file string) bool {
 func ReadCard(path string) (Card, error) {
 	var card Card
 
-	//card.Title = ToSlug(strings.TrimSuffix(path, ".md")) + ".md"
-	card.Title = path
+	card.Name = path
 	contents, err := ioutil.ReadFile(filepath.FromSlash(path))
 	if err != nil {
 		return card, err
@@ -134,7 +133,7 @@ func filterLabels(cards []Card, labels []string) []string {
 	for _, card := range cards {
 		l := asStringSlice(card.Properties["labels"])
 		if ContainsStrings(l, labels) {
-			ret = append(ret, card.Title)
+			ret = append(ret, card.Name)
 		}
 	}
 	return ret

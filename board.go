@@ -8,39 +8,29 @@ import (
 )
 
 type Board struct {
-	Title string `toml:"title" json:"title"`
-	Decks []Deck `toml:"decks" json:"decks"`
+	Name  string `toml:"name" json:"name"`
+	Decks []Deck `toml:"deck" json:"decks"`
 }
 
 type Deck struct {
-	Title  string   `toml:"title" json:"title"`
+	Name   string   `toml:"name" json:"name"`
 	Labels []string `toml:"labels" json:"labels"`
-	Cards  []string `toml:"cards" json:"cards"`
+	Names  []string `toml:"names" json:"names"`
 }
 
-func (board Board) Get(cards []Card) Board {
+func (deck Deck) Get(cards []Card) []string {
+	ret := []string{}
 
-	boarddir := GetPath(board.Title)
-
-	for i, deck := range board.Decks {
-		for j, card := range deck.Cards {
-			deck.Cards[j] = boarddir + card
-		}
-		//		if len(deck.Labels) > 0 {
-		board.Decks[i].Cards = filterLabels(cards, deck.Labels)
-		//}
-		// TODO: filter by path here...
-		temp := []string{}
-		for _, card := range board.Decks[i].Cards {
-			//fmt.Println(card, filepath.Dir(board.Title))
-			if strings.HasPrefix(card, boarddir) {
-				temp = append(temp, card)
-			}
-		}
-		board.Decks[i].Cards = temp
+	if len(deck.Names) > 0 {
+		return deck.Names
 	}
 
-	return board
+	if len(deck.Labels) > 0 {
+		ret = append(ret, filterLabels(cards, deck.Labels)...)
+	}
+
+	return ret
+
 }
 
 func IsBoard(file string) bool {
@@ -68,7 +58,7 @@ func ReadBoards(files []string) []Board {
 func ReadBoard(path string) (Board, error) {
 	var board Board
 
-	board.Title = ToSlug(strings.TrimSuffix(path, "board.toml"))
+	board.Name = ToSlug(strings.TrimSuffix(path, "board.toml"))
 
 	contents, err := ioutil.ReadFile(filepath.FromSlash(path))
 	if err != nil {
@@ -82,7 +72,7 @@ func ReadBoard(path string) (Board, error) {
 
 func GetBoard(boards []Board, board string) Board {
 	for _, b := range boards {
-		if b.Title == board {
+		if b.Name == board {
 			return b
 		}
 	}
