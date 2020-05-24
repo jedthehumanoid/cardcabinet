@@ -128,12 +128,12 @@ func ReadCards(files []string) []Card {
 	return cards
 }
 
-func filterLabels(cards []Card, labels []string) []string {
-	ret := []string{}
+func filterLabels(cards []Card, labels []string) []Card {
+	ret := []Card{}
 	for _, card := range cards {
 		l := asStringSlice(card.Properties["labels"])
 		if ContainsStrings(l, labels) {
-			ret = append(ret, card.Name)
+			ret = append(ret, card)
 		}
 	}
 	return ret

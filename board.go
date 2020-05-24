@@ -18,23 +18,37 @@ type Deck struct {
 	Names  []string `toml:"names" json:"names"`
 }
 
-func (deck Deck) Get(cards []Card) []string {
-	ret := []string{}
-
-	if len(deck.Names) > 0 {
-		return deck.Names
+func (board Board) Cards(cards []Card) []Card {
+	ret := []Card{}
+	dir := filepath.Dir(board.Name)
+	for _, card := range cards {
+		if strings.HasPrefix(card.Name, dir) {
+			ret = append(ret, card)
+		}
 	}
-
-	if len(deck.Labels) > 0 {
-		ret = append(ret, filterLabels(cards, deck.Labels)...)
-	}
-
 	return ret
+}
 
+func (deck Deck) Get(cards []Card) []Card {
+	if len(deck.Names) > 0 {
+		temp := []Card{}
+		for _, card := range cards {
+			if ContainsString(deck.Names, card.Name) {
+				temp = append(temp, card)
+			}
+		}
+		cards = temp
+	} else if len(deck.Labels) > 0 && deck.Labels[0] != "" {
+		cards = filterLabels(cards, deck.Labels)
+	}
+
+	//	fmt.Println("deckget", cards)
+
+	return cards
 }
 
 func IsBoard(file string) bool {
-	return strings.HasSuffix(file, ".board.toml")
+	return strings.HasSuffix(file, "board.toml")
 }
 
 func ReadBoards(files []string) []Board {
