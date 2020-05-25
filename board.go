@@ -20,9 +20,10 @@ type Deck struct {
 
 func (board Board) Cards(cards []Card) []Card {
 	ret := []Card{}
-	dir := filepath.Dir(board.Name)
+	dir := filepath.Dir(board.Name) + string(filepath.Separator)
 	for _, card := range cards {
 		if strings.HasPrefix(card.Name, dir) {
+			card.Name = strings.TrimPrefix(card.Name, dir)
 			ret = append(ret, card)
 		}
 	}
@@ -41,8 +42,6 @@ func (deck Deck) Get(cards []Card) []Card {
 	} else if len(deck.Labels) > 0 && deck.Labels[0] != "" {
 		cards = filterLabels(cards, deck.Labels)
 	}
-
-	//	fmt.Println("deckget", cards)
 
 	return cards
 }
