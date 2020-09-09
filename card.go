@@ -112,10 +112,10 @@ func ReadCard(path string) (Card, error) {
 	return card, nil
 }
 
-func ReadCards(files []string) []Card {
+func ReadCards(dir string) []Card {
 	cards := []Card{}
 
-	for _, file := range files {
+	for _, file := range FindFiles(dir) {
 		if !isCard(file) {
 			continue
 		}
@@ -123,6 +123,7 @@ func ReadCards(files []string) []Card {
 		if err != nil {
 			panic(err)
 		}
+		card.Name = strings.TrimPrefix(card.Name, dir)
 		cards = append(cards, card)
 	}
 	return cards

@@ -50,10 +50,10 @@ func IsBoard(file string) bool {
 	return strings.HasSuffix(file, "board.toml")
 }
 
-func ReadBoards(files []string) []Board {
+func ReadBoards(dir string) []Board {
 	boards := []Board{}
 
-	for _, file := range files {
+	for _, file := range FindFiles(dir) {
 		if !IsBoard(file) {
 			continue
 		}
