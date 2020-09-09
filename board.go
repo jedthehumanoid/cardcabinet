@@ -1,6 +1,7 @@
 package cardcabinet
 
 import (
+	_ "fmt"
 	"github.com/BurntSushi/toml"
 	"io/ioutil"
 	"path/filepath"
@@ -21,6 +22,9 @@ type Deck struct {
 func (board Board) Cards(cards []Card) []Card {
 	ret := []Card{}
 	dir := filepath.Dir(board.Name) + string(filepath.Separator)
+	if dir == "./" {
+		dir = ""
+	}
 	for _, card := range cards {
 		if strings.HasPrefix(card.Name, dir) {
 			card.Name = strings.TrimPrefix(card.Name, dir)
@@ -62,6 +66,8 @@ func ReadBoards(dir string) []Board {
 		if err != nil {
 			panic(err)
 		}
+
+		board.Name = strings.TrimPrefix(board.Name, dir)
 		boards = append(boards, board)
 	}
 
