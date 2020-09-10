@@ -1,7 +1,6 @@
 package cardcabinet
 
 import (
-	"fmt"
 	"github.com/BurntSushi/toml"
 	"io/ioutil"
 	"path/filepath"
@@ -19,14 +18,18 @@ type Deck struct {
 	Names  []string `toml:"names" json:"names"`
 }
 
-func (board Board) Cards(cards []Card) []Card {
-	ret := []Card{}
+func (board Board) Path() string {
 	dir := filepath.Dir(board.Name)
 	dir = strings.TrimPrefix(dir, ".") + "/"
-	fmt.Println(dir)
-	if dir == "//" {
+	if dir == "//" || dir == "/" {
 		dir = ""
 	}
+	return dir
+}
+
+func (board Board) Cards(cards []Card) []Card {
+	ret := []Card{}
+	dir := board.Path()
 	for _, card := range cards {
 		if strings.HasPrefix(card.Name, dir) {
 			card.Name = strings.TrimPrefix(card.Name, dir)
