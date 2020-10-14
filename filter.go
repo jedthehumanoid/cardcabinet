@@ -4,8 +4,8 @@ import "fmt"
 
 type filter struct {
 	Attribute string
-	Method string
-	RHS string
+	Method    string
+	RHS       string
 }
 
 func Filter(cards []Card, s string) []Card {
@@ -13,12 +13,7 @@ func Filter(cards []Card, s string) []Card {
 	return []Card{}
 }
 
-func parseFilter(s string) [][]filter{
-
+func parseFilter(s string) [][]filter {
+	filter := [][]filter{}
+	return filter
 }
-// Ett filter skulle kunna se ut:
-// labels contains "jobb"
-// labels contains ["jobb","task"]
-// Kan man json-parsa just tredje delen
-// labels has jobb and ( assignee = Mattias Jadelius or assignee = Anders Englund )
-// labels includes jobb,task and assignee = Mattias Jadelius or labels has jobb and assignee = Anders Englund

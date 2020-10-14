@@ -18,6 +18,8 @@ type Card struct {
 	Frontmatter string                 `json:"frontmatter,omitempty"`
 }
 
+// MarshalFrontmatter returns properties as frontmatter string
+// of correct type, including or excluding fences
 func (card Card) MarshalFrontmatter(fences bool) string {
 	ret := ""
 
@@ -86,7 +88,7 @@ func isCard(file string) bool {
 	return strings.HasSuffix(file, ".md")
 }
 
-// ReadCardFile takes a file path, reading file in to a card.
+// ReadCard takes a file path, reading file in to a card.
 func ReadCard(path string) (Card, error) {
 	var card Card
 
@@ -112,6 +114,7 @@ func ReadCard(path string) (Card, error) {
 	return card, nil
 }
 
+// ReadCards reads all cards in directory, and subdirectories
 func ReadCards(dir string) []Card {
 	cards := []Card{}
 
@@ -127,15 +130,4 @@ func ReadCards(dir string) []Card {
 		cards = append(cards, card)
 	}
 	return cards
-}
-
-func filterLabels(cards []Card, labels []string) []Card {
-	ret := []Card{}
-	for _, card := range cards {
-		l := asStringSlice(card.Properties["labels"])
-		if ContainsStrings(l, labels) {
-			ret = append(ret, card)
-		}
-	}
-	return ret
 }

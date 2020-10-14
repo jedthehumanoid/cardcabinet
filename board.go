@@ -1,10 +1,11 @@
 package cardcabinet
 
 import (
-	"github.com/BurntSushi/toml"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
+
+	"github.com/BurntSushi/toml"
 )
 
 type Board struct {
@@ -83,7 +84,7 @@ func ReadBoards(dir string) []Board {
 func ReadBoard(path string) (Board, error) {
 	var board Board
 
-	board.Name = ToSlug(strings.TrimSuffix(path, "board.toml"))
+	board.Name = strings.TrimSuffix(path, "board.toml")
 
 	contents, err := ioutil.ReadFile(filepath.FromSlash(path))
 	if err != nil {
@@ -102,4 +103,15 @@ func GetBoard(boards []Board, board string) Board {
 		}
 	}
 	return Board{}
+}
+
+func filterLabels(cards []Card, labels []string) []Card {
+	ret := []Card{}
+	for _, card := range cards {
+		l := asStringSlice(card.Properties["labels"])
+		if ContainsStrings(l, labels) {
+			ret = append(ret, card)
+		}
+	}
+	return ret
 }
