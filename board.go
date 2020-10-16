@@ -56,14 +56,10 @@ func (deck Deck) Get(cards []Card) []Card {
 	return cards
 }
 
-func IsBoard(file string) bool {
-	return strings.HasSuffix(file, "board.toml")
-}
-
 func ReadBoards(dir string) []Board {
 	boards := []Board{}
 	for _, file := range FindFiles(dir) {
-		if !IsBoard(file) {
+		if !strings.HasSuffix(file, "board.toml") {
 			continue
 		}
 
@@ -94,15 +90,6 @@ func ReadBoard(path string) (Board, error) {
 	_, err = toml.Decode(string(contents), &board)
 
 	return board, err
-}
-
-func GetBoard(boards []Board, board string) Board {
-	for _, b := range boards {
-		if b.Name == board {
-			return b
-		}
-	}
-	return Board{}
 }
 
 func filterLabels(cards []Card, labels []string) []Card {

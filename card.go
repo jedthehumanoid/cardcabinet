@@ -2,7 +2,6 @@ package cardcabinet
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/BurntSushi/toml"
 	yaml "gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -48,46 +47,6 @@ func (card Card) MarshalFrontmatter(fences bool) string {
 	return ret
 }
 
-func GetLabels(cards []Card) []string {
-	labels := []string{}
-
-	for _, card := range cards {
-		for _, label := range asStringSlice(card.Properties["labels"]) {
-			if !ContainsString(labels, label) {
-				labels = append(labels, label)
-			}
-		}
-	}
-
-	return labels
-}
-
-func GetFolders(cards []Card) []string {
-	folders := []string{}
-
-	for _, card := range cards {
-		folder := filepath.Dir(card.Name)
-		if folder != "." && !ContainsString(folders, folder) {
-			folders = append(folders, folder)
-		}
-	}
-
-	return folders
-}
-
-func GetCard(cards []Card, name string) (Card, error) {
-	for _, card := range cards {
-		if card.Name == name {
-			return card, nil
-		}
-	}
-	return Card{}, fmt.Errorf("Cannot find %s", name)
-}
-
-func isCard(file string) bool {
-	return strings.HasSuffix(file, ".md")
-}
-
 // ReadCard takes a file path, reading file in to a card.
 func ReadCard(path string) (Card, error) {
 	var card Card
@@ -119,7 +78,7 @@ func ReadCards(dir string) []Card {
 	cards := []Card{}
 
 	for _, file := range FindFiles(dir) {
-		if !isCard(file) {
+		if !strings.HasSuffix(file, ".md") {
 			continue
 		}
 		card, err := ReadCard(file)
