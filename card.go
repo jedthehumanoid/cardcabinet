@@ -23,7 +23,7 @@ func (card Card) MarshalFrontmatter(fences bool) string {
 	ret := ""
 
 	switch card.Frontmatter {
-	case "yaml":
+	case "YAML":
 		b, _ := yaml.Marshal(card.Properties)
 		frontmatter := strings.TrimSpace(string(b))
 		if frontmatter != "{}" {
@@ -32,7 +32,7 @@ func (card Card) MarshalFrontmatter(fences bool) string {
 				ret = "---\n" + ret + "\n---"
 			}
 		}
-	case "toml":
+	case "TOML":
 		buf := new(bytes.Buffer)
 		toml.NewEncoder(buf).Encode(card.Properties)
 		frontmatter := strings.TrimSpace(buf.String())
@@ -56,20 +56,17 @@ func ReadCard(path string) (Card, error) {
 	if err != nil {
 		return card, err
 	}
-	frontmatter, raw, b := GetFrontmatter(contents)
-	card.Frontmatter = frontmatter
 
-	card.Contents = strings.TrimPrefix(string(contents), string(raw))
-	card.Contents = strings.TrimSpace(card.Contents)
+	card.Contents = string(contents)
+	card.Frontmatter = HasFrontmatter(card.Contents)
 
-	switch frontmatter {
-	case "yaml":
-		err = yaml.Unmarshal(b, &card.Properties)
-		return card, err
-	case "toml":
-		_, err = toml.Decode(string(b), &card.Properties)
+	properties, err := UnmarshalFrontmatter(card.Contents)
+	if err != nil {
 		return card, err
 	}
+	card.Properties = properties
+	card.Contents = RemoveFrontmatter(card.Contents)
+
 	return card, nil
 }
 
