@@ -11,30 +11,6 @@ type filter struct {
 	RHS       string
 }
 
-func Contains(card Card, property string, s string) bool {
-	fmt.Println("contains?")
-	fmt.Println(s)
-	fmt.Println(card.Properties[property])
-	switch t := card.Properties[property].(type) {
-	case string:
-		fmt.Println("string!")
-	case []interface{}:
-		fmt.Println("[]interface{}")
-		switch t[0].(type) {
-
-		case string:
-			fmt.Println("of string")
-		case int64:
-			fmt.Println("of int")
-		case float64:
-			fmt.Println("of float")
-		}
-	}
-	fmt.Println()
-
-	return false
-}
-
 func typeOf(i interface{}) string {
 	switch t := i.(type) {
 	case string:
@@ -70,8 +46,10 @@ func query(card Card, querystring string) bool {
 	method := tokens[1]
 	rhs := tokens[2]
 
-	if typeOf(property) == "stringSlice" && method == "contains" {
-		return ContainsString(asStringSlice(property), rhs)
+	if method == "CONTAINS" || method == "..." {
+		if typeOf(property) == "stringSlice" {
+			return ContainsString(asStringSlice(property), rhs)
+		}
 	}
 	return false
 }

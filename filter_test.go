@@ -5,6 +5,6 @@ import "testing"
 func TestParseFilter(t *testing.T) {
 	cards := ReadCards("testdata/")
 
-	queryCards(cards, "labels contains todo AND labels contains test OR labels contains jobb")
+	queryCards(cards, "labels ... todo AND labels ... test OR labels ... jobb")
 
 }
