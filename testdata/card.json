@@ -1,0 +1,10 @@
+{
+   "name": "testdata/card.md",
+   "contents": "Testkort\n- ja\n- nej",
+   "properties": {
+      "labels": [
+         "hej"
+      ]
+   },
+   "frontmatter": "TOML"
+}
