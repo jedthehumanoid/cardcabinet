@@ -1,7 +1,6 @@
 package cardcabinet
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -44,7 +43,7 @@ func query(card Card, querystring string) bool {
 	tokens := strings.Split(querystring, " ")
 	property := tokens[0]
 	method := tokens[1]
-	rhs := tokens[2]
+	rhs := strings.Join(tokens[2:], " ")
 
 	if property == "name" {
 		switch method {
@@ -57,8 +56,12 @@ func query(card Card, querystring string) bool {
 
 	switch method {
 	case "CONTAINS", "...":
-		if typeOf(property) == "stringSlice" {
-			return ContainsString(asStringSlice(property), rhs)
+		if typeOf(card.Properties[property]) == "stringSlice" {
+			return ContainsString(asStringSlice(card.Properties[property]), rhs)
+		}
+	case "EQUALS", "=":
+		if typeOf(card.Properties[property]) == "string" {
+			return card.Properties[property] == rhs
 		}
 	}
 	return false
@@ -87,9 +90,6 @@ func queryCards(cards []Card, querystring string) []Card {
 		if queryCard(card, querystring) {
 			ret = append(ret, card)
 		}
-	}
-	for _, card := range ret {
-		fmt.Println(card.Name)
 	}
 	return ret
 }
