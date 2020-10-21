@@ -2,7 +2,6 @@ package cardcabinet
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 )
 
@@ -21,15 +20,14 @@ func Contains(card Card, property string, s string) bool {
 		fmt.Println("string!")
 	case []interface{}:
 		fmt.Println("[]interface{}")
-		fmt.Println(toJSON(t[0]))
-		fmt.Println(reflect.TypeOf(t[0]).String())
 		switch t[0].(type) {
 
 		case string:
 			fmt.Println("of string")
 		case int64:
 			fmt.Println("of int")
-
+		case float64:
+			fmt.Println("of float")
 		}
 	}
 	fmt.Println()
@@ -37,23 +35,73 @@ func Contains(card Card, property string, s string) bool {
 	return false
 }
 
-func parseFilter(s string) [][]filter {
-	filters := [][]filter{}
-	fmt.Println("FILTER:", s)
-	for _, or := range strings.Split(s, "OR") {
+func typeOf(i interface{}) string {
+	switch t := i.(type) {
+	case string:
+		return "string"
+	case int64:
+		return "int"
+	case float64:
+		return "float"
+	case bool:
+		return "bool"
+	case []interface{}:
+		switch t[0].(type) {
+		case string:
+			return "stringSlice"
+		case int64:
+			return "intSlice"
+		case float64:
+			return "floatSlice"
+		case bool:
+			return "boolSlice"
+		}
+	}
+	return ""
+}
+
+func stringSliceContains() {
+
+}
+
+func query(card Card, querystring string) bool {
+	tokens := strings.Split(querystring, " ")
+	property := card.Properties[tokens[0]]
+	method := tokens[1]
+	rhs := tokens[2]
+
+	if typeOf(property) == "stringSlice" && method == "contains" {
+		return ContainsString(asStringSlice(property), rhs)
+	}
+	return false
+}
+
+func queryCard(card Card, querystring string) bool {
+	for _, or := range strings.Split(querystring, "OR") {
 		or = strings.TrimSpace(or)
-		fmt.Println("OR:", or)
+		keep := true
 		for _, and := range strings.Split(or, "AND") {
 			and = strings.TrimSpace(and)
-			fmt.Println("AND:", and)
-			tokens := strings.Split(and, " ")
-			attr := tokens[0]
-			Method := tokens[1]
-			rhs := tokens[2:]
-			filter := filter{attr, Method, strings.Join(rhs, " ")}
-			fmt.Printf("%+v\n", filter)
+			if !query(card, and) {
+				keep = false
+			}
 		}
-
+		if keep {
+			return true
+		}
 	}
-	return filters
+	return false
+}
+
+func queryCards(cards []Card, querystring string) []Card {
+	ret := []Card{}
+	for _, card := range cards {
+		if queryCard(card, querystring) {
+			ret = append(ret, card)
+		}
+	}
+	for _, card := range ret {
+		fmt.Println(card.Name)
+	}
+	return ret
 }

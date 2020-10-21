@@ -12,7 +12,7 @@ func TestReadCard(t *testing.T) {
 	card, _ := ReadCard("testdata/card.md")
 
 	result := toJSONIndent(card)
-	
+
 	b, _ := ioutil.ReadFile("testdata/card.json")
 	expected := strings.TrimSpace(string(b))
 
@@ -29,8 +29,8 @@ func TestReadCards(t *testing.T) {
 		c = append(c, card.Name)
 	}
 	result := toJSON(c)
-	
-	expected := toJSON([]string{"add-magnets.md", "card.md"})
+
+	expected := toJSON([]string{"add-magnets.md", "card.md", "types.md"})
 
 	if result != expected {
 		t.Errorf("unexpected result, got: %s, expected: %s", result, expected)
@@ -46,4 +46,3 @@ func toJSONIndent(i interface{}) string {
 	b, _ := json.MarshalIndent(i, "", "   ")
 	return string(b)
 }
-

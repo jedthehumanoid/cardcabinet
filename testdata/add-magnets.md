@@ -1,5 +1,5 @@
 +++
-	labels = ["todo"]
+	labels = ["todo","test"]
 +++
 
 # Magnets
