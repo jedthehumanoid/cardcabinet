@@ -42,11 +42,21 @@ func stringSliceContains() {
 
 func query(card Card, querystring string) bool {
 	tokens := strings.Split(querystring, " ")
-	property := card.Properties[tokens[0]]
+	property := tokens[0]
 	method := tokens[1]
 	rhs := tokens[2]
 
-	if method == "CONTAINS" || method == "..." {
+	if property == "name" {
+		switch method {
+		case "CONTAINS", "...":
+			return strings.Contains(card.Name, rhs)
+		case "EQUALS", "=":
+			return card.Name == rhs
+		}
+	}
+
+	switch method {
+	case "CONTAINS", "...":
 		if typeOf(property) == "stringSlice" {
 			return ContainsString(asStringSlice(property), rhs)
 		}
