@@ -1,4 +1,4 @@
-module github.com/jedthehumanoid/card-cabinet
+module github.com/jedthehumanoid/cardcabinet
 
 go 1.13
 
