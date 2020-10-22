@@ -59,7 +59,7 @@ func (deck Deck) Get(cards []Card) []Card {
 func ReadBoards(dir string) []Board {
 	boards := []Board{}
 	for _, file := range FindFiles(dir) {
-		if !strings.HasSuffix(file, "board.toml") {
+		if !strings.HasSuffix(file, ".board.toml") {
 			continue
 		}
 
@@ -80,7 +80,7 @@ func ReadBoards(dir string) []Board {
 func ReadBoard(path string) (Board, error) {
 	var board Board
 
-	board.Name = strings.TrimSuffix(path, "board.toml")
+	board.Name = strings.TrimSuffix(path, ".board.toml")
 
 	contents, err := ioutil.ReadFile(filepath.FromSlash(path))
 	if err != nil {
