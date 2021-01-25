@@ -1,0 +1,10 @@
+{
+   "name": "testdata/wonky-middlematter.md",
+   "contents": "# Cards\n\nA card is just markdown contents with metadata read from frontmatter.\n\n```\n---\nlabels: [doc]\ntitle: Foo\n---\n# Foo\n...\n```\n\nbecomes\n\n```json\n{\n   \"name\": \"path/to/document.md\"\n   \"properties\": {\n      \"labels\": [\"doc\"]\n      \"title\": \"Foo\"\n   \"contents\": \"# Foo\\n...\"\n\n}\n```\n\n## Name\n\nName is a slug, including path:\n\n/path/to/document-name.md\n\n## Contents\n\nContents is file contents with frontmatter block removed.",
+   "properties": {
+      "labels": [
+         "doc"
+      ]
+   },
+   "frontmatter": "TOML"
+}

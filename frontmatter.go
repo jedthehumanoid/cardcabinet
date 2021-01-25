@@ -8,8 +8,8 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-var yamlregexp = regexp.MustCompile("(?ms)^---($.*)^---$")
-var tomlregexp = regexp.MustCompile("(?ms)^\\+\\+\\+($.*)^\\+\\+\\+$")
+var yamlregexp = regexp.MustCompile("(?ms)\\A\\s*?---([\\s\\S]*?)^---$")
+var tomlregexp = regexp.MustCompile("(?ms)\\A\\s*?\\+\\+\\+([\\s\\S]*?)^\\+\\+\\+$")
 
 func HasFrontmatter(s string) string {
 	match := yamlregexp.FindStringSubmatch(s)
