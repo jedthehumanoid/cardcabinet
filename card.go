@@ -87,3 +87,12 @@ func ReadCards(dir string) []Card {
 	}
 	return cards
 }
+
+func (card Card) Path() string {
+	dir := filepath.Dir(card.Name)
+	dir = strings.TrimPrefix(dir, ".") + "/"
+	if dir == "//" || dir == "/" {
+		dir = ""
+	}
+	return dir
+}
