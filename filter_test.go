@@ -2,6 +2,7 @@ package cardcabinet
 
 import (
 	"testing"
+"strings"
 )
 
 func TestQuery(t *testing.T) {
@@ -11,6 +12,7 @@ func TestQuery(t *testing.T) {
 		cards []string
 	}{
 		{"labels ... todo AND labels ... test OR labels ... jobb", []string{"add-magnets.md", "types.md"}},
+		{"labels ... todo AND labels ... test", []string{"add-magnets.md"}},
 		{"name = types.md", []string{"types.md"}},
 		{"assignee = Ture Sventton", []string{"add-magnets.md"}},
 	}
@@ -25,6 +27,51 @@ func TestQuery(t *testing.T) {
 			if toJSON(result) != toJSON(tc.cards) {
 				t.Fatalf("unexpected result, expected: %s, got: %s", toJSON(tc.cards), toJSON(result))
 			}
+		})
+	}
+}
+
+
+func TestSplit(t *testing.T) {
+
+	tt := []struct {
+		query string
+		ret []string
+	}{
+		{"one two three", []string{"one", "two", "three"}},
+		{"one \"forty two\" three", []string{"one", "forty two", "three"}},
+		{"one 'forty two' three", []string{"one", "forty two", "three"}},
+	}
+	for _, tc := range tt {
+		t.Run(tc.query, func(t *testing.T) {
+			result := split(tc.query)
+			if toJSON(result) != toJSON(tc.ret) {
+				t.Fatalf("unexpected result, expected: %s, got: %s", toJSON(tc.ret), toJSON(result))
+			}
+		})
+	}
+}
+
+
+func TestQueryRPN(t *testing.T) {
+
+	tt := []struct {
+		query []string
+	}{
+		{[]string{"one", "two", "..."}},
+		{[]string{"labels", "forty two", "...", "labels", "task", "...", "&&"}},
+		{[]string{"true", "true", "&&", "false", "||"}},
+		{[]string{"true", "false", "&&", "false", "||"}},	
+	}
+	cards := ReadCards("testdata/")
+	for _, tc := range tt {
+		t.Run(strings.Join(tc.query, ","), func(t *testing.T) {
+			queryRPN(cards[0],tc.query)
+/*
+			if toJSON(result) != toJSON(tc.ret) {
+				t.Fatalf("unexpected result, expected: %s, got: %s", toJSON(tc.ret), toJSON(result))
+			}
+*/
 		})
 	}
 }

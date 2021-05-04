@@ -1,5 +1,5 @@
 +++
-	labels = ["jobb"]
+	labels = ["jobb", "test"]
 	labelsstring = "hej"
 	labelsintslice = [1,3]
 	labelsfloat = [2.4,2.5]

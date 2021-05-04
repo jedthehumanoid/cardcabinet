@@ -48,11 +48,12 @@ func TestReadCards(t *testing.T) {
 	}
 }
 
+/*
 func toJSON(i interface{}) string {
 	b, _ := json.Marshal(i)
 	return string(b)
 }
-
+*/
 func toJSONIndent(i interface{}) string {
 	b, _ := json.MarshalIndent(i, "", "   ")
 	return string(b)
