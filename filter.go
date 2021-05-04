@@ -40,14 +40,13 @@ func typeOf(i interface{}) string {
 
 
 func queryRPN(card Card, query []string) bool {
-	operators :=  map[string]func([]string) []string {
+	operators :=  map[string]func(Card, []string) []string {
 		"...": contains,
-		"=": contains,
+		"=": equals,
 		"&&": and,
 		"||": or,
 	}
-	fmt.Println(toJSON(query))
-
+	
 	stack := []string{}
 	
 	for _,s := range query {
@@ -57,21 +56,27 @@ func queryRPN(card Card, query []string) bool {
 			push(&stack, s)
 		} else {
 			fmt.Printf("%s? %s\n", s, toJSON(stack))
-			stack = function(stack)
+			stack = function(card, stack)
 		}		
 	}
 	fmt.Println(stack)
 	fmt.Println()
-	return false
+	return len(stack) == 1 && stack[0] == "true"
 }
 
-func contains(stack []string) []string {
-	_ = pop(&stack)
-	_ = pop(&stack)
-	return append(stack, "true")
+func contains(card Card, stack []string) []string {
+	b := pop(&stack)
+	a := pop(&stack)
+	return append(stack, fmt.Sprintf("%t", ContainsString(asStringSlice(card.Properties[a]), b)))
 }
-
-func or(stack []string) []string {
+	
+func equals(card Card, stack []string) []string {
+	b := pop(&stack)
+	a := pop(&stack)
+	return append(stack, fmt.Sprintf("%t", card.Properties[a] == b))
+}
+	
+func or(card Card, stack []string) []string {
 	a := pop(&stack)
 	b := pop(&stack)
 	
@@ -83,7 +88,7 @@ func or(stack []string) []string {
 }
 
 
-func and(stack []string) []string {
+func and(card Card, stack []string) []string {
 	a := pop(&stack)
 	b := pop(&stack)
 	
@@ -152,8 +157,11 @@ func queryCard(card Card, querystring string) bool {
 
 func queryCards(cards []Card, querystring string) []Card {
 	ret := []Card{}
+
+	qs := split(querystring)
 	for _, card := range cards {
-		if queryCard(card, querystring) {
+		fmt.Println(card.Name)
+		if queryRPN(card, qs) {
 			ret = append(ret, card)
 		}
 	}

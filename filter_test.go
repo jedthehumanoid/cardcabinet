@@ -11,10 +11,10 @@ func TestQuery(t *testing.T) {
 		query string
 		cards []string
 	}{
-		{"labels ... todo AND labels ... test OR labels ... jobb", []string{"add-magnets.md", "types.md"}},
-		{"labels ... todo AND labels ... test", []string{"add-magnets.md"}},
-		{"name = types.md", []string{"types.md"}},
-		{"assignee = Ture Sventton", []string{"add-magnets.md"}},
+		{"labels todo ... labels test ... && labels jobb ... ||", []string{"add-magnets.md", "types.md"}},
+		{"labels todo ... labels test ... &&", []string{"add-magnets.md"}},
+		//{"name types.md =", []string{"types.md"}},
+		{"assignee \"Ture Sventton\" =", []string{"add-magnets.md"}},
 	}
 	cards := ReadCards("testdata/")
 	for _, tc := range tt {
@@ -52,16 +52,13 @@ func TestSplit(t *testing.T) {
 	}
 }
 
-
 func TestQueryRPN(t *testing.T) {
-
 	tt := []struct {
 		query []string
 	}{
-		{[]string{"one", "two", "..."}},
-		{[]string{"labels", "forty two", "...", "labels", "task", "...", "&&"}},
-		{[]string{"true", "true", "&&", "false", "||"}},
-		{[]string{"true", "false", "&&", "false", "||"}},	
+		{[]string{"labels", "todo", "...", "labels", "wontfix", "...", "&&"}},
+		{[]string{"labels", "forty two", "...", "labels", "test", "...", "||"}},
+		{[]string{"assignee", "Ture Sventton", "="}},
 	}
 	cards := ReadCards("testdata/")
 	for _, tc := range tt {
