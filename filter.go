@@ -39,7 +39,7 @@ func typeOf(i interface{}) string {
 }
 
 
-func queryRPN(card Card, query []string) bool {
+func QueryRPN(card Card, query []string) bool {
 	operators :=  map[string]func(Card, []string) []string {
 		"...": contains,
 		"=": equals,
@@ -48,19 +48,21 @@ func queryRPN(card Card, query []string) bool {
 	}
 	
 	stack := []string{}
-	
-	for i,s := range query {
+	if len(query) == 0 {
+		return true
+	}
+	for _,s := range query {
 	
 		function, operator := operators[s]
 		if !operator {
 			push(&stack, s)
 		} else {
-			fmt.Printf("%s [%s] %s\n", prettystack(stack), s, prettystack(query[i+1:]))
+			//fmt.Printf("%s [%s] %s\n", prettystack(stack), s, prettystack(query[i+1:]))
 			stack = function(card, stack)
 		}		
 	}
-	fmt.Println(prettystack(stack))
-	fmt.Println()
+	//fmt.Println(prettystack(stack))
+	//fmt.Println()
 	return len(stack) == 1 && stack[0] == "true"
 }
 
@@ -114,13 +116,12 @@ func split(s string) []string {
 	return ret
 }
 
-func queryCards(cards []Card, querystring string) []Card {
+func QueryCards(cards []Card, querystring string) []Card {
 	ret := []Card{}
 
 	qs := split(querystring)
 	for _, card := range cards {
-		fmt.Println(card.Name)
-		if queryRPN(card, qs) {
+		if QueryRPN(card, qs) {
 			ret = append(ret, card)
 		}
 	}
