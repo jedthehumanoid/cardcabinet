@@ -3,6 +3,7 @@ package cardcabinet
 import (
 	"testing"
 "strings"
+
 )
 
 func TestQuery(t *testing.T) {
@@ -13,10 +14,11 @@ func TestQuery(t *testing.T) {
 	}{
 		{"labels todo ... labels test ... && labels jobb ... ||", []string{"add-magnets.md", "types.md"}},
 		{"labels todo ... labels test ... &&", []string{"add-magnets.md"}},
-		//{"name types.md =", []string{"types.md"}},
+		{"name types.md =", []string{"types.md"}},
 		{"assignee \"Ture Sventton\" =", []string{"add-magnets.md"}},
 	}
 	cards := ReadCards("testdata/")
+	
 	for _, tc := range tt {
 		t.Run(tc.query, func(t *testing.T) {
 			r := queryCards(cards, tc.query)

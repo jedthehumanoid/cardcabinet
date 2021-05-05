@@ -49,17 +49,17 @@ func queryRPN(card Card, query []string) bool {
 	
 	stack := []string{}
 	
-	for _,s := range query {
+	for i,s := range query {
 	
 		function, operator := operators[s]
 		if !operator {
 			push(&stack, s)
 		} else {
-			fmt.Printf("%s? %s\n", s, toJSON(stack))
+			fmt.Printf("%s [%s] %s\n", prettystack(stack), s, prettystack(query[i+1:]))
 			stack = function(card, stack)
 		}		
 	}
-	fmt.Println(stack)
+	fmt.Println(prettystack(stack))
 	fmt.Println()
 	return len(stack) == 1 && stack[0] == "true"
 }
@@ -73,7 +73,12 @@ func contains(card Card, stack []string) []string {
 func equals(card Card, stack []string) []string {
 	b := pop(&stack)
 	a := pop(&stack)
-	return append(stack, fmt.Sprintf("%t", card.Properties[a] == b))
+	if a == "name" {
+		return append(stack, fmt.Sprintf("%t", card.Name == b))
+	} else {
+		return append(stack, fmt.Sprintf("%t", card.Properties[a] == b))
+	}
+	
 }
 	
 func or(card Card, stack []string) []string {
@@ -99,35 +104,6 @@ func and(card Card, stack []string) []string {
 	}
 }
 
-func query(card Card, querystring string) bool {
-	querystring = strings.TrimSpace(querystring)
-	tokens := strings.Split(querystring, " ")
-	property := tokens[0]
-	method := tokens[1]
-	rhs := strings.Join(tokens[2:], " ")
-
-	if property == "name" {
-		switch method {
-		case "CONTAINS", "...":
-			return strings.Contains(card.Name, rhs)
-		case "EQUALS", "=":
-			return card.Name == rhs
-		}
-	}
-
-	switch method {
-	case "CONTAINS", "...":
-		if typeOf(card.Properties[property]) == "stringSlice" {
-			return ContainsString(asStringSlice(card.Properties[property]), rhs)
-		}
-	case "EQUALS", "=":
-		if typeOf(card.Properties[property]) == "string" {
-			return card.Properties[property] == rhs
-		}
-	}
-	return false
-}
-
 // Solution from https://stackoverflow.com/questions/47489745/splitting-a-string-at-space-except-inside-quotation-marks
 func split(s string) []string {
 	r := regexp.MustCompile(`[^\s"']+|"([^"]*)"|'([^']*)'`) 
@@ -136,23 +112,6 @@ func split(s string) []string {
 	ret[i] = strings.Trim(ret[i], "\"'")
 	}
 	return ret
-}
-
-func queryCard(card Card, querystring string) bool {
-	keep := false
-	for _, x := range strings.Split(querystring, "OR") {
-		for _, y := range strings.Split(x, "AND") {
-			keep = query(card, y)
-			if !keep {
-				break
-			}
-		}
-		
-		if keep {
-			return true
-		}
-	}
-	return false
 }
 
 func queryCards(cards []Card, querystring string) []Card {
@@ -182,4 +141,16 @@ func pop(slice *[]string) string {
 
 func push(slice *[]string, value string) {
    *slice = append(*slice, value)
+}
+
+func prettystack(stack []string) string {
+	ret := []string{}
+	for _, s := range stack {
+		if strings.Contains(s, " ") {
+			s = "'" + s + "'"
+		}
+		ret = append(ret, s)
+	}
+	return strings.Join(ret, " ")
+
 }
