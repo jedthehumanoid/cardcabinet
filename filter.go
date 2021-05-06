@@ -118,9 +118,9 @@ func split(s string) []string {
 
 func QueryCards(cards []Card, querystring string) []Card {
 	ret := []Card{}
-
 	qs := split(querystring)
 	for _, card := range cards {
+	//	fmt.Println(card.Name)
 		if QueryRPN(card, qs) {
 			ret = append(ret, card)
 		}

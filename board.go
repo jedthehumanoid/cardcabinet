@@ -15,8 +15,7 @@ type Board struct {
 
 type Deck struct {
 	Name   string   `toml:"name" json:"name"`
-	Labels []string `toml:"labels" json:"labels"`
-	Names  []string `toml:"names" json:"names"`
+	Query string `toml:"query" json:"query"`
 }
 
 func (board Board) Path() string {
@@ -41,17 +40,8 @@ func (board Board) Cards(cards []Card) []Card {
 }
 
 func (deck Deck) Get(cards []Card) []Card {
-	if len(deck.Names) > 0 {
-		temp := []Card{}
-		for _, card := range cards {
-			if ContainsString(deck.Names, card.Name) {
-				temp = append(temp, card)
-			}
-		}
-		cards = temp
-	} else if len(deck.Labels) > 0 && deck.Labels[0] != "" {
-		cards = filterLabels(cards, deck.Labels)
-	}
+	cards = QueryCards(cards, deck.Query)
+	
 
 	return cards
 }
