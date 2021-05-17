@@ -46,9 +46,9 @@ func (deck Deck) Get(cards []Card) []Card {
 	return cards
 }
 
-func ReadBoards(dir string) []Board {
+func ReadBoards(dir string, recursive bool) []Board {
 	boards := []Board{}
-	for _, file := range FindFiles(dir) {
+	for _, file := range FindFiles(dir, recursive) {
 		if !strings.HasSuffix(file, ".board.toml") {
 			continue
 		}

@@ -9,11 +9,21 @@ import (
 
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
+	"io/ioutil"
+	
 )
 
 // FindFiles is like find
-func FindFiles(path string) []string {
+func FindFiles(path string, recursive bool) []string {
 	files := []string{}
+	if !recursive {
+		dirfiles, _ := ioutil.ReadDir(path)
+		for _, file := range dirfiles {
+		   if !file.IsDir() {
+			files = append(files, file.Name())
+		   }
+		}
+   } else {
 	filepath.Walk(path,
 		func(file string, f os.FileInfo, err error) error {
 			if err != nil {
@@ -24,6 +34,7 @@ func FindFiles(path string) []string {
 			}
 			return nil
 		})
+	}
 	return files
 }
 

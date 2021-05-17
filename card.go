@@ -71,10 +71,10 @@ func ReadCard(path string) (Card, error) {
 }
 
 // ReadCards reads all cards in directory, and subdirectories
-func ReadCards(dir string) []Card {
+func ReadCards(dir string, recursive bool) []Card {
 	cards := []Card{}
-
-	for _, file := range FindFiles(dir) {
+	
+	for _, file := range FindFiles(dir, recursive) {
 		if !strings.HasSuffix(file, ".md") {
 			continue
 		}
