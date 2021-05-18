@@ -66,14 +66,12 @@ func ReadCard(path string) (Card, error) {
 	}
 	card.Properties = properties
 	card.Contents = RemoveFrontmatter(card.Contents)
-
 	return card, nil
 }
 
 // ReadCards reads all cards in directory, and subdirectories
 func ReadCards(dir string, recursive bool) []Card {
 	cards := []Card{}
-	
 	for _, file := range FindFiles(dir, recursive) {
 		if !strings.HasSuffix(file, ".md") {
 			continue
@@ -82,7 +80,7 @@ func ReadCards(dir string, recursive bool) []Card {
 		if err != nil {
 			panic(err)
 		}
-		card.Name = strings.TrimPrefix(card.Name, dir)
+		
 		cards = append(cards, card)
 	}
 	return cards

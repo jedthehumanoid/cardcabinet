@@ -58,7 +58,6 @@ func ReadBoards(dir string, recursive bool) []Board {
 			panic(err)
 		}
 
-		board.Name = strings.TrimPrefix(board.Name, dir)
 		if board.Name == "" {
 			board.Name = "/"
 		}
