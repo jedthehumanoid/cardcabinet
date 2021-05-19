@@ -5,6 +5,7 @@ import (
 	"github.com/BurntSushi/toml"
 	yaml "gopkg.in/yaml.v2"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -72,6 +73,11 @@ func ReadCard(path string) (Card, error) {
 // ReadCards reads all cards in directory, and subdirectories
 func ReadCards(dir string, recursive bool) []Card {
 	cards := []Card{}
+	fi, err := os.Stat(dir)
+	if err == nil && !fi.Mode().IsDir() {
+		return cards
+	}
+
 	for _, file := range FindFiles(dir, recursive) {
 		if !strings.HasSuffix(file, ".md") {
 			continue
@@ -80,7 +86,7 @@ func ReadCards(dir string, recursive bool) []Card {
 		if err != nil {
 			panic(err)
 		}
-		
+
 		cards = append(cards, card)
 	}
 	return cards
