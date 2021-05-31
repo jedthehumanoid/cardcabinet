@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"github.com/jedthehumanoid/cardcabinet/frontmatter"
 )
 
 // Card is markdown with properties (from frontmatter).
@@ -59,14 +60,14 @@ func ReadCard(path string) (Card, error) {
 	}
 
 	card.Contents = string(contents)
-	card.Frontmatter = HasFrontmatter(card.Contents)
+	card.Frontmatter = frontmatter.HasFrontmatter(card.Contents)
 
-	properties, err := UnmarshalFrontmatter(card.Contents)
+	properties, err := frontmatter.UnmarshalFrontmatter(card.Contents)
 	if err != nil {
 		return card, err
 	}
 	card.Properties = properties
-	card.Contents = RemoveFrontmatter(card.Contents)
+	card.Contents = frontmatter.RemoveFrontmatter(card.Contents)
 	return card, nil
 }
 
