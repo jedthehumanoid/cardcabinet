@@ -1,9 +1,6 @@
 package cardcabinet
 
 import (
-	"bytes"
-	"github.com/BurntSushi/toml"
-	yaml "gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -22,31 +19,7 @@ type Card struct {
 // MarshalFrontmatter returns properties as frontmatter string
 // of correct type, including or excluding fences
 func (card Card) MarshalFrontmatter(fences bool) string {
-	ret := ""
-
-	switch card.Frontmatter {
-	case "YAML":
-		b, _ := yaml.Marshal(card.Properties)
-		frontmatter := strings.TrimSpace(string(b))
-		if frontmatter != "{}" {
-			ret = frontmatter
-			if fences {
-				ret = "---\n" + ret + "\n---"
-			}
-		}
-	case "TOML":
-		buf := new(bytes.Buffer)
-		toml.NewEncoder(buf).Encode(card.Properties)
-		frontmatter := strings.TrimSpace(buf.String())
-		if frontmatter != "" {
-			ret = frontmatter
-			if fences {
-				ret = "+++\n" + ret + "\n+++"
-			}
-		}
-	}
-
-	return ret
+	return frontmatter.MarshalFrontmatter(card.Properties, card.Frontmatter, fences)
 }
 
 // ReadCard takes a file path, reading file in to a card.
@@ -93,6 +66,7 @@ func ReadCards(dir string, recursive bool) []Card {
 	return cards
 }
 
+// Path returns path of card
 func (card Card) Path() string {
 	dir := filepath.Dir(card.Name)
 	dir = strings.TrimPrefix(dir, ".") + "/"

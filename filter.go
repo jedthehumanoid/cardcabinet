@@ -7,13 +7,7 @@ import (
 	"encoding/json"
 )
 
-type filter struct {
-	Attribute string
-	Method    string
-	RHS       string
-}
-
-func typeOf(i interface{}) string {
+func _typeOf(i interface{}) string {
 	switch t := i.(type) {
 	case string:
 		return "string"
@@ -57,12 +51,9 @@ func QueryRPN(card Card, query []string) bool {
 		if !operator {
 			push(&stack, s)
 		} else {
-			//fmt.Printf("%s [%s] %s\n", prettystack(stack), s, prettystack(query[i+1:]))
 			stack = function(card, stack)
 		}		
 	}
-	//fmt.Println(prettystack(stack))
-	//fmt.Println()
 	return len(stack) == 1 && stack[0] == "true"
 }
 
@@ -79,14 +70,12 @@ func equals(card Card, stack []string) []string {
 		return append(stack, fmt.Sprintf("%t", card.Name == b))
 	} else {
 		return append(stack, fmt.Sprintf("%t", card.Properties[a] == b))
-	}
-	
+	}	
 }
 	
 func or(card Card, stack []string) []string {
 	a := pop(&stack)
 	b := pop(&stack)
-	
 	if a == "true" || b == "true"  {
 		return append(stack, "true")	
 	} else {
@@ -120,7 +109,6 @@ func QueryCards(cards []Card, querystring string) []Card {
 	ret := []Card{}
 	qs := split(querystring)
 	for _, card := range cards {
-	//	fmt.Println(card.Name)
 		if QueryRPN(card, qs) {
 			ret = append(ret, card)
 		}

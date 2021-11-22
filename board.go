@@ -18,6 +18,7 @@ type Deck struct {
 	Query string `toml:"query" json:"query"`
 }
 
+// Path returns path of board
 func (board Board) Path() string {
 	dir := filepath.Dir(board.Name)
 	dir = strings.TrimPrefix(dir, ".") + "/"
@@ -27,25 +28,14 @@ func (board Board) Path() string {
 	return dir
 }
 
-func (board Board) Cards(cards []Card) []Card {
-	ret := []Card{}
-	dir := board.Path()
-	for _, card := range cards {
-		if strings.HasPrefix(card.Name, dir) {
-			card.Name = strings.TrimPrefix(card.Name, dir)
-			ret = append(ret, card)
-		}
-	}
-	return ret
-}
-
+// Get returns all cards in deck
 func (deck Deck) Get(cards []Card) []Card {
 	cards = QueryCards(cards, deck.Query)
-	
-
 	return cards
 }
 
+ 
+// ReadBoards reads all boards in dir into boards
 func ReadBoards(dir string, recursive bool) []Board {
 	boards := []Board{}
 	for _, file := range FindFiles(dir, recursive) {
@@ -57,37 +47,19 @@ func ReadBoards(dir string, recursive bool) []Board {
 		if err != nil {
 			panic(err)
 		}
-
-		if board.Name == "" {
-			board.Name = "/"
-		}
 		boards = append(boards, board)
 	}
 	return boards
 }
 
-func ReadBoard(path string) (Board, error) {
+// ReadBoard reads a board.toml file into a board
+func ReadBoard(dir string) (Board, error) {
 	var board Board
-
-	board.Name = strings.TrimSuffix(path, ".board.toml")
-
-	contents, err := ioutil.ReadFile(filepath.FromSlash(path))
+	board.Name = strings.TrimSuffix(dir, ".board.toml")
+	contents, err := ioutil.ReadFile(filepath.FromSlash(dir))
 	if err != nil {
 		return board, err
 	}
-
 	_, err = toml.Decode(string(contents), &board)
-
 	return board, err
-}
-
-func filterLabels(cards []Card, labels []string) []Card {
-	ret := []Card{}
-	for _, card := range cards {
-		l := asStringSlice(card.Properties["labels"])
-		if ContainsStrings(l, labels) {
-			ret = append(ret, card)
-		}
-	}
-	return ret
 }
