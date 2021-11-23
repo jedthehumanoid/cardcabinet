@@ -30,7 +30,7 @@ func Query(query []string) bool {
 	return len(stack) == 1 && stack[0] == "true"
 }
 
-func _typeOf(i interface{}) string {
+func typeOf(i interface{}) string {
 	switch t := i.(type) {
 	case string:
 		return "string"
@@ -69,7 +69,13 @@ func push(slice *[]string, value string) {
 func contains(stack []string) []string {
 	b := fromJSON(pop(&stack))
 	a := fromJSON(pop(&stack))
-	return append(stack, fmt.Sprintf("%t", containsString(asStringSlice(a), b.(string))))
+	switch typeOf(a) {
+	case "string":
+		return append(stack, fmt.Sprintf("%t", strings.Contains(a.(string), b.(string))))
+	case "stringSlice":
+		return append(stack, fmt.Sprintf("%t", containsString(asStringSlice(a), b.(string))))
+	}
+	return append(stack, "false")
 }
 
 func equals(stack []string) []string {
