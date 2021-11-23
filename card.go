@@ -1,11 +1,11 @@
 package cardcabinet
 
 import (
+	"github.com/jedthehumanoid/cardcabinet/frontmatter"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
-	"github.com/jedthehumanoid/cardcabinet/frontmatter"
 )
 
 // Card is markdown with properties (from frontmatter).

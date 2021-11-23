@@ -1,11 +1,10 @@
 package cardcabinet
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
-	"io/ioutil"
-	
 )
 
 // FindFiles is like find
@@ -14,21 +13,21 @@ func FindFiles(path string, recursive bool) []string {
 	if !recursive {
 		dirfiles, _ := ioutil.ReadDir(path)
 		for _, file := range dirfiles {
-		   if !file.IsDir() {
-			files = append(files, file.Name())
-		   }
+			if !file.IsDir() {
+				files = append(files, file.Name())
+			}
 		}
-   } else {
-	filepath.Walk(path,
-		func(file string, f os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if !f.IsDir() {
-				files = append(files, file)
-			}
-			return nil
-		})
+	} else {
+		filepath.Walk(path,
+			func(file string, f os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+				if !f.IsDir() {
+					files = append(files, file)
+				}
+				return nil
+			})
 	}
 	return files
 }

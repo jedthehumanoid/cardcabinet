@@ -14,7 +14,7 @@ type Board struct {
 }
 
 type Deck struct {
-	Name   string   `toml:"name" json:"name"`
+	Name  string `toml:"name" json:"name"`
 	Query string `toml:"query" json:"query"`
 }
 
@@ -34,7 +34,6 @@ func (deck Deck) Get(cards []Card) []Card {
 	return cards
 }
 
- 
 // ReadBoards reads all boards in dir into boards
 func ReadBoards(dir string, recursive bool) []Board {
 	boards := []Board{}

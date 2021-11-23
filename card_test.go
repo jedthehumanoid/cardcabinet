@@ -10,10 +10,10 @@ import (
 
 func TestReadCard(t *testing.T) {
 
-	tt := []struct{
-		Input string
+	tt := []struct {
+		Input  string
 		Output string
-	} {
+	}{
 		{"testdata/card.md", "testdata/card.json"},
 		{"testdata/wonky-middlematter.md", "testdata/wonky-middlematter.json"},
 	}

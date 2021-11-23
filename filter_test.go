@@ -1,9 +1,8 @@
 package cardcabinet
 
 import (
+	"strings"
 	"testing"
-"strings"
-
 )
 
 func TestQuery(t *testing.T) {
@@ -18,7 +17,7 @@ func TestQuery(t *testing.T) {
 		{"assignee \"Ture Sventton\" =", []string{"add-magnets.md"}},
 	}
 	cards := ReadCards("testdata/")
-	
+
 	for _, tc := range tt {
 		t.Run(tc.query, func(t *testing.T) {
 			r := queryCards(cards, tc.query)
@@ -33,12 +32,11 @@ func TestQuery(t *testing.T) {
 	}
 }
 
-
 func TestSplit(t *testing.T) {
 
 	tt := []struct {
 		query string
-		ret []string
+		ret   []string
 	}{
 		{"one two three", []string{"one", "two", "three"}},
 		{"one \"forty two\" three", []string{"one", "forty two", "three"}},
@@ -65,12 +63,12 @@ func TestQueryRPN(t *testing.T) {
 	cards := ReadCards("testdata/")
 	for _, tc := range tt {
 		t.Run(strings.Join(tc.query, ","), func(t *testing.T) {
-			queryRPN(cards[0],tc.query)
-/*
-			if toJSON(result) != toJSON(tc.ret) {
-				t.Fatalf("unexpected result, expected: %s, got: %s", toJSON(tc.ret), toJSON(result))
-			}
-*/
+			queryRPN(cards[0], tc.query)
+			/*
+				if toJSON(result) != toJSON(tc.ret) {
+					t.Fatalf("unexpected result, expected: %s, got: %s", toJSON(tc.ret), toJSON(result))
+				}
+			*/
 		})
 	}
 }
