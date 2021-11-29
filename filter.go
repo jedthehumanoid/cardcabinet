@@ -6,16 +6,10 @@ import (
 	"strings"
 )
 
-func QueryCards(cards []Card, querystring string) []Card {
-	ret := []Card{}
-	qs := rpn.Split(querystring)
-	for _, card := range cards {
-		s := expandStackVariables(qs, card)
-		if rpn.Query(s) {
-			ret = append(ret, card)
-		}
-	}
-	return ret
+func (card Card) Match(filter string) bool {
+	stack := rpn.Split(filter)
+	s := expandStackVariables(stack, card)
+	return rpn.Query(s)
 }
 
 func expandStackVariables(stack []string, card Card) []string {

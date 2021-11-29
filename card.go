@@ -23,11 +23,11 @@ func (card Card) MarshalFrontmatter(fences bool) string {
 }
 
 // ReadCard takes a file path, reading file in to a card.
-func ReadCard(path string) (Card, error) {
+func ReadCard(filename string) (Card, error) {
 	var card Card
 
-	card.Name = path
-	contents, err := ioutil.ReadFile(filepath.FromSlash(path))
+	card.Name = filename
+	contents, err := ioutil.ReadFile(filepath.FromSlash(filename))
 	if err != nil {
 		return card, err
 	}
@@ -51,8 +51,8 @@ func ReadCards(dir string, recursive bool) []Card {
 	if err == nil && !fi.Mode().IsDir() {
 		return cards
 	}
-
-	for _, file := range FindFiles(dir, recursive) {
+	// Map strings, cards
+	for _, file := range findFiles(dir, recursive) {
 		if !strings.HasSuffix(file, ".md") {
 			continue
 		}
@@ -63,12 +63,22 @@ func ReadCards(dir string, recursive bool) []Card {
 
 		cards = append(cards, card)
 	}
+	// Map cards, cards
+	for i := range cards {
+		cards[i].Name = strings.TrimPrefix(cards[i].Name, dir)
+		cards[i].Name = strings.TrimPrefix(cards[i].Name, "/")
+	}
+
 	return cards
 }
 
 // Path returns path of card
 func (card Card) Path() string {
-	dir := filepath.Dir(card.Name)
+	return getPath(card.Name)
+}
+
+func getPath(filename string) string {
+	dir := filepath.Dir(filename)
 	dir = strings.TrimPrefix(dir, ".") + "/"
 	if dir == "//" || dir == "/" {
 		dir = ""

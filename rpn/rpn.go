@@ -30,29 +30,14 @@ func Query(query []string) bool {
 	return len(stack) == 1 && stack[0] == "true"
 }
 
+// typeOf only exists because of type switching a slice returns []interface{}
 func typeOf(i interface{}) string {
 	switch t := i.(type) {
-	case string:
-		return "string"
-	case int64:
-		return "int"
-	case float64:
-		return "float"
-	case bool:
-		return "bool"
 	case []interface{}:
-		switch t[0].(type) {
-		case string:
-			return "stringSlice"
-		case int64:
-			return "intSlice"
-		case float64:
-			return "floatSlice"
-		case bool:
-			return "boolSlice"
-		}
+		return fmt.Sprintf("[]%T", t[0])
+	default:
+		return fmt.Sprintf("%T", i)
 	}
-	return ""
 }
 
 func pop(slice *[]string) string {
@@ -72,7 +57,7 @@ func contains(stack []string) []string {
 	switch typeOf(a) {
 	case "string":
 		return append(stack, fmt.Sprintf("%t", strings.Contains(a.(string), b.(string))))
-	case "stringSlice":
+	case "[]string":
 		return append(stack, fmt.Sprintf("%t", containsString(asStringSlice(a), b.(string))))
 	}
 	return append(stack, "false")
