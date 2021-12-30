@@ -51,8 +51,9 @@ func ReadCards(dir string, recursive bool) []Card {
 	if err == nil && !fi.Mode().IsDir() {
 		return cards
 	}
-	// Map strings, cards
+	// mfr Map strings, cards
 	for _, file := range findFiles(dir, recursive) {
+		// mfr Filter string
 		if !strings.HasSuffix(file, ".md") {
 			continue
 		}
@@ -63,7 +64,7 @@ func ReadCards(dir string, recursive bool) []Card {
 
 		cards = append(cards, card)
 	}
-	// Map cards, cards
+	// mfr Map cards, cards
 	for i := range cards {
 		cards[i].Name = strings.TrimPrefix(cards[i].Name, dir)
 		cards[i].Name = strings.TrimPrefix(cards[i].Name, "/")

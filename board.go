@@ -26,7 +26,7 @@ func (board Board) Path() string {
 // FilterCards returns all cards that matches deck filter
 func (deck Deck) FilterCards(cards []Card) []Card {
 	ret := []Card{}
-	// Map[Cards]
+	// mfr filter[Cards]
 	for _, card := range cards {
 		if card.Match(deck.Filter) {
 			ret = append(ret, card)
@@ -36,14 +36,24 @@ func (deck Deck) FilterCards(cards []Card) []Card {
 	return ret
 }
 
+func isBoard(filename string) bool {
+	return strings.HasSuffix(filename, ".board.toml")
+}
+
+func FilterStrings(vs []string, f func(string) bool) []string {
+	vsf := make([]string, 0)
+	for _, v := range vs {
+		if f(v) {
+			vsf = append(vsf, v)
+		}
+	}
+	return vsf
+}
+
 // ReadBoards reads all boards in dir into boards
 func ReadBoards(dir string, recursive bool) []Board {
 	boards := []Board{}
-	for _, file := range findFiles(dir, recursive) {
-		if !strings.HasSuffix(file, ".board.toml") {
-			continue
-		}
-
+	for _, file := range FilterStrings(findFiles(dir, recursive), isBoard) {
 		board, err := ReadBoard(file)
 		if err != nil {
 			panic(err)
@@ -51,6 +61,7 @@ func ReadBoards(dir string, recursive bool) []Board {
 		boards = append(boards, board)
 	}
 	for i := range boards {
+		// mfr Map cards cards
 		boards[i].Name = strings.TrimPrefix(boards[i].Name, dir)
 		boards[i].Name = strings.TrimPrefix(boards[i].Name, "/")
 	}

@@ -14,6 +14,7 @@ func (card Card) Match(filter string) bool {
 
 func expandStackVariables(stack []string, card Card) []string {
 	ret := []string{}
+	// mfr map strings strings
 	for _, token := range stack {
 		_, operator := rpn.Operators[token]
 		if strings.HasPrefix(token, "\"") || operator {

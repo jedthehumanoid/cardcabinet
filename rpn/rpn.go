@@ -96,10 +96,11 @@ func fromJSON(j string) interface{} {
 }
 
 func asStringSlice(i interface{}) []string {
-	ret := []string{}
 	if i == nil {
-		return ret
+		return []string{}
 	}
+	ret := []string{}
+	// mfr map interface strings
 	for _, v := range i.([]interface{}) {
 		ret = append(ret, v.(string))
 	}
