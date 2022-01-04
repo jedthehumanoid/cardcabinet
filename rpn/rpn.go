@@ -7,27 +7,26 @@ import (
 	"strings"
 )
 
-var Operators = map[string]func([]string) []string{
-	"...": contains,
-	"=":   equals,
-	"&&":  and,
-	"||":  or,
+type Rpn struct{
+	stack []string
 }
 
-func Query(query []string) bool {
-	stack := []string{}
-	if len(query) == 0 {
-		return true
-	}
+func (rpn *Rpn) Eval(query []string) error {
 	for _, s := range query {
-		function, operator := Operators[s]
-		if !operator {
-			push(&stack, s)
-		} else {
-			stack = function(stack)
+		switch s {
+		case "...":
+			rpn.contains()
+		case "=":
+			rpn.equals()
+		case "&":
+			rpn.and()
+		case "|":
+			rpn.or()
+		default:
+			rpn.push(s)
 		}
 	}
-	return len(stack) == 1 && stack[0] == "true"
+	return nil
 }
 
 // typeOf only exists because of type switching a slice returns []interface{}
@@ -40,51 +39,60 @@ func typeOf(i interface{}) string {
 	}
 }
 
-func pop(slice *[]string) string {
-	length := len(*slice)
-	ret := (*slice)[length-1]
-	*slice = append((*slice)[:length-1])
-	return ret
+func (rpn *Rpn) pop() (string, error) {
+	length := len(rpn.stack)
+	ret := rpn.stack[length-1]
+	 rpn.stack = append(rpn.stack[:length-1])
+	return ret, nil
 }
 
-func push(slice *[]string, value string) {
-	*slice = append(*slice, value)
+func (rpn *Rpn) push(value string) error {
+	rpn.stack = append(rpn.stack, value)
+	return nil
 }
 
-func contains(stack []string) []string {
-	b := fromJSON(pop(&stack))
-	a := fromJSON(pop(&stack))
+func (rpn *Rpn) contains() error {
+	
+	val, _ := rpn.pop()
+	b := fromJSON(val)
+	val, _ = rpn.pop()
+	a := fromJSON(val)
 	switch typeOf(a) {
 	case "string":
-		return append(stack, fmt.Sprintf("%t", strings.Contains(a.(string), b.(string))))
+		rpn.push(fmt.Sprintf("%t", strings.Contains(a.(string), b.(string))))
 	case "[]string":
-		return append(stack, fmt.Sprintf("%t", containsString(asStringSlice(a), b.(string))))
+		rpn.push(fmt.Sprintf("%t", containsString(asStringSlice(a), b.(string))))
+	default:
+		rpn.push("false")
 	}
-	return append(stack, "false")
+	return nil
 }
 
-func equals(stack []string) []string {
-	b := pop(&stack)
-	a := pop(&stack)
-	return append(stack, fmt.Sprintf("%t", a == b))
+func (rpn *Rpn) equals() error {
+	b,_ := rpn.pop()
+	a,_ := rpn.pop()
+	rpn.push(fmt.Sprintf("%t", a == b))
+	return nil
 
 }
 
-func or(stack []string) []string {
-	b := pop(&stack)
-	a := pop(&stack)
-	return append(stack, fmt.Sprintf("%t", a == "true" || b == "true"))
+func (rpn *Rpn) or() error {
+	b,_ := rpn.pop()
+	a,_ := rpn.pop()
+	rpn.push(fmt.Sprintf("%t", a == "true" || b == "true"))
+	return nil
 }
 
-func and(stack []string) []string {
-	b := pop(&stack)
-	a := pop(&stack)
-	return append(stack, fmt.Sprintf("%t", a == "true" && b == "true"))
+func (rpn *Rpn) and() error {
+	b, _ := rpn.pop()
+	a, _ := rpn.pop()
+	rpn.push(fmt.Sprintf("%t", a == "true" && b == "true"))
+	return nil
 }
 
-// Solution from https://stackoverflow.com/questions/47489745/splitting-a-string-at-space-except-inside-quotation-marks
 func Split(s string) []string {
-	r := regexp.MustCompile(`[^\s"']+|"([^"]*)"|'([^']*)'`)
+	fmt.Println(s)
+	r := regexp.MustCompile(`[^\s"']+|"[^"]*"|'[^']*'`)
 	ret := r.FindAllString(s, -1)
 	return ret
 }
@@ -95,6 +103,11 @@ func fromJSON(j string) interface{} {
 	return i
 }
 
+
+func toJSON(i interface{}) string {
+	b, _ := json.Marshal(i)
+	return string(b)
+}
 func asStringSlice(i interface{}) []string {
 	if i == nil {
 		return []string{}

@@ -33,7 +33,7 @@ func TestReadCard(t *testing.T) {
 }
 
 func TestReadCards(t *testing.T) {
-	cards := ReadCards("testdata/")
+	cards := ReadCards("testdata/", false)
 
 	c := []string{}
 	for _, card := range cards {
