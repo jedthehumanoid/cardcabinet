@@ -40,9 +40,9 @@ func typeOf(i interface{}) string {
 }
 
 func (rpn *Rpn) pop() (string, error) {
-	length := len(rpn.stack)
-	ret := rpn.stack[length-1]
-	 rpn.stack = append(rpn.stack[:length-1])
+	len := len(rpn.stack)
+	ret := rpn.stack[len-1]
+	rpn.stack = rpn.stack[:len - 1]
 	return ret, nil
 }
 
@@ -90,8 +90,8 @@ func (rpn *Rpn) and() error {
 	return nil
 }
 
+// TODO: use go-shellwords?
 func Split(s string) []string {
-	fmt.Println(s)
 	r := regexp.MustCompile(`[^\s"']+|"[^"]*"|'[^']*'`)
 	ret := r.FindAllString(s, -1)
 	return ret

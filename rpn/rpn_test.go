@@ -1,6 +1,6 @@
 package rpn
 
-import(
+import (
 	"testing"
 )
 
@@ -40,7 +40,7 @@ func TestEvalTwoValues(t *testing.T) {
 		t.Errorf("expected stack to have two values")
 	}
 
-	if rpn.stack[0] != "true" || rpn.stack[1] != "false"{
+	if rpn.stack[0] != "true" || rpn.stack[1] != "false" {
 		t.Errorf("expected values to be \"true\" and \"false\"")
 	}
 }
@@ -54,7 +54,7 @@ func TestEvalAnd(t *testing.T) {
 	if len(rpn.stack) != 1 {
 		t.Errorf("expected stack to have one value, %v", rpn)
 	}
-	
+
 	if rpn.stack[0] != "false" {
 		t.Errorf("expected result to be false")
 	}
@@ -67,7 +67,7 @@ func TestEvalAnd(t *testing.T) {
 	if len(rpn.stack) != 1 {
 		t.Errorf("expected stack to have one value, %v", rpn)
 	}
-	
+
 	if rpn.stack[0] != "true" {
 		t.Errorf("expected result to be true")
 	}
@@ -80,12 +80,11 @@ func TestEvalAnd(t *testing.T) {
 	if len(rpn.stack) != 1 {
 		t.Errorf("expected stack to have one value, %v", rpn)
 	}
-	
+
 	if rpn.stack[0] != "false" {
 		t.Errorf("expected result to be false")
 	}
 }
-
 
 func TestEvalOr(t *testing.T) {
 	rpn := Rpn{}
@@ -96,7 +95,7 @@ func TestEvalOr(t *testing.T) {
 	if len(rpn.stack) != 1 {
 		t.Errorf("expected stack to have one value, %v", rpn)
 	}
-	
+
 	if rpn.stack[0] != "true" {
 		t.Errorf("expected result to be true")
 	}
@@ -109,7 +108,7 @@ func TestEvalOr(t *testing.T) {
 	if len(rpn.stack) != 1 {
 		t.Errorf("expected stack to have one value, %v", rpn)
 	}
-	
+
 	if rpn.stack[0] != "true" {
 		t.Errorf("expected result to be true")
 	}
@@ -122,12 +121,11 @@ func TestEvalOr(t *testing.T) {
 	if len(rpn.stack) != 1 {
 		t.Errorf("expected stack to have one value, %v", rpn)
 	}
-	
+
 	if rpn.stack[0] != "false" {
 		t.Errorf("expected result to be false")
 	}
 }
-
 
 func TestEvalContainsWithSlice(t *testing.T) {
 	rpn := Rpn{}
@@ -168,7 +166,6 @@ func TestEvalContainsWithString(t *testing.T) {
 		t.Errorf("expected stack to have false, had %v", rpn.stack)
 	}
 }
-
 
 func TestEvalEqual(t *testing.T) {
 	rpn := Rpn{}
@@ -214,5 +211,48 @@ func TestSplit(t *testing.T) {
 	if toJSON(result) != `["split","here","but","\"not here\"","and","'not here'"]` {
 		t.Errorf("Unexpected result, got: \n%s", toJSON(result))
 	}
-	
+
+}
+
+func TestPush(t *testing.T) {
+	rpn := Rpn{}
+	rpn.push("foo")
+	if len(rpn.stack) != 1 || rpn.stack[0] != "foo" {
+		t.Errorf("Expected exactly one value: \"foo\"")
+	}
+	rpn.push("bar")
+	if len(rpn.stack) != 2 || rpn.stack[0] != "foo" || rpn.stack[1] != "bar" {
+		t.Errorf("Expected two values, \"foo\" and \"bar\"")
+	}
+
+}
+
+
+func TestPop(t *testing.T) {
+	rpn := Rpn{}
+	rpn.push("foo")
+	rpn.push("bar")
+
+	val, err := rpn.pop()
+	if err != nil {
+		panic(err)
+	}
+	if len(rpn.stack) != 1 || rpn.stack[0] != "foo" {
+		t.Errorf("Expected exactly one value: \"foo\"")
+	}
+	if val != "bar" {
+		t.Errorf("Expected to have popped \"bar\"")
+	}
+
+	val, err = rpn.pop()
+	if err != nil {
+		panic(err)
+	}
+	if len(rpn.stack) != 0 {
+		t.Errorf("Expected zero values, no less, no more")
+	}
+	if val != "foo" {
+		t.Errorf("Expected to have popped \"foo\"")
+	}
+
 }

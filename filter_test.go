@@ -14,7 +14,7 @@ func TestExpandFromContext(t *testing.T) {
 
 	result := expandFromContext(`name "jack" = labels "dull" boy ... "name" "labels"`, context)
 	expected := `"jack" "jack" = ["dull","boy"] "dull" boy ... "name" "labels"`
-
+	
 	if result != expected {
 		t.Errorf("unexpected value: %s, expected: %s", result, expected)
 	}
