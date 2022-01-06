@@ -5,48 +5,33 @@ import (
 	"testing"
 )
 
-func TestExpandFromContext(t *testing.T) {
-
-	context := `{
-		"name": "jack",
-		"labels": ["dull", "boy"]
-	}`
-
-	result := expandFromContext(`name "jack" = labels "dull" boy ... "name" "labels"`, context)
-	expected := `"jack" "jack" = ["dull","boy"] "dull" boy ... "name" "labels"`
-	
-	if result != expected {
-		t.Errorf("unexpected value: %s, expected: %s", result, expected)
-	}
-}
-/*
-func TestQuery(t *testing.T) {
-
+func TestMatch(t *testing.T) {
 	tt := []struct {
 		query string
-		cards []string
+		card string
+		match bool
 	}{
-		{"labels todo ... labels test ... && labels jobb ... ||", []string{"add-magnets.md", "types.md"}},
-		{"labels todo ... labels test ... &&", []string{"add-magnets.md"}},
-		{"name types.md =", []string{"types.md"}},
-		{"assignee \"Ture Sventton\" =", []string{"add-magnets.md"}},
+		{`labels "todo" ... labels "jobb" ... |`, "add-magnets.md", true},
+		{`labels "todo"... labels "test" ... &`, "add-magnets.md", true},
+		{`assignee "Ture Sventton" =`, "add-magnets.md", true},
 	}
-	cards := ReadCards("testdata/", false)
 
 	for _, tc := range tt {
 		t.Run(tc.query, func(t *testing.T) {
-			r := queryCards(cards, tc.query)
-			result := []string{}
-			for _, card := range r {
-				result = append(result, card.Name)
+			card, err := ReadCard("testdata/"+tc.card)
+			if err != nil {
+				panic(err)
 			}
-			if toJSON(result) != toJSON(tc.cards) {
-				t.Fatalf("unexpected result, expected: %s, got: %s", toJSON(tc.cards), toJSON(result))
+			result := card.Match(tc.query)
+			if result != tc.match {
+				t.Errorf("unexpected result, %t != %t", result, tc.match)
 			}
+		
+		
 		})
 	}
 }
-
+/*
 func TestSplit(t *testing.T) {
 
 	tt := []struct {
