@@ -2,6 +2,7 @@ package cardcabinet
 
 import (
 	"github.com/jedthehumanoid/cardcabinet/frontmatter"
+	"github.com/jedthehumanoid/cardcabinet/rpn"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -20,6 +21,18 @@ type Card struct {
 // of correct type, including or excluding fences
 func (card Card) MarshalFrontmatter(fences bool) string {
 	return frontmatter.MarshalFrontmatter(card.Properties, card.Frontmatter, fences)
+}
+
+// Path returns path of card
+func (card Card) Path() string {
+	return getPath(card.Name)
+}
+
+func (card Card) Match(filter string) bool {
+	rpn := rpn.Rpn{}
+	rpn.Variables = card.Properties
+	rpn.Eval(filter)
+	return len(rpn.Stack) == 1 && rpn.Stack[0] == "true"
 }
 
 // ReadCard takes a file path, reading file in to a card.
@@ -71,11 +84,6 @@ func ReadCards(dir string, recursive bool) []Card {
 	}
 
 	return cards
-}
-
-// Path returns path of card
-func (card Card) Path() string {
-	return getPath(card.Name)
 }
 
 func getPath(filename string) string {
