@@ -14,7 +14,7 @@ func findFiles(dir string, recursive bool) []string {
 		for _, file := range dirfiles {
 			// mfr filter os.fileinfo
 			if !file.IsDir() {
-				files = append(files, dir + file.Name())
+				files = append(files, dir+file.Name())
 			}
 		}
 	} else {

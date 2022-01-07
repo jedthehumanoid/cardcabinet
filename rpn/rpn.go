@@ -13,10 +13,10 @@ type Rpn struct {
 }
 
 func (rpn *Rpn) Eval(query string) error {
-	fmt.Println("EVAL:", query)
-	fmt.Println("Variables: ", rpn.Variables)
-	for i, s := range Split(query) {
-		fmt.Printf("%d: %v -- %s\n", i, rpn.Stack, s)
+	//fmt.Println("EVAL:", query)
+	//	fmt.Println("Variables: ", rpn.Variables)
+	for _, s := range Split(query) {
+		//fmt.Printf("%d: %v -- %s\n", i, rpn.Stack, s)
 		switch s {
 		case "...":
 			rpn.contains()
@@ -30,7 +30,7 @@ func (rpn *Rpn) Eval(query string) error {
 			rpn.push(s)
 		}
 	}
-	fmt.Println("FINISHED:", rpn.Stack)
+	//	fmt.Println("FINISHED:", rpn.Stack)
 	return nil
 }
 
@@ -69,7 +69,7 @@ func (rpn *Rpn) pop() (string, error) {
 	len := len(rpn.Stack)
 	val := rpn.Stack[len-1]
 	rpn.Stack = rpn.Stack[:len-1]
-	return val, nil 
+	return val, nil
 }
 
 func (rpn *Rpn) popVal() (interface{}, error) {
@@ -87,25 +87,22 @@ func (rpn *Rpn) push(value string) error {
 }
 
 func (rpn *Rpn) expand(s string) (string, error) {
-	fmt.Println("expand:", s)
 	value, exists := rpn.Variables[s]
 	if exists {
-		fmt.Println(value)
 		return toJSON(value), nil
 	}
-	fmt.Println("missing")
 	return "", fmt.Errorf("Missing variable: %s", s)
 }
 
 func (rpn *Rpn) contains() error {
 	val, _ := rpn.pop()
-	if fromJSON(val) == nil { 
+	if fromJSON(val) == nil {
 		val, _ = rpn.expand(val)
 	}
 	b := fromJSON(val)
 
 	val, _ = rpn.pop()
-	if fromJSON(val) == nil { 
+	if fromJSON(val) == nil {
 		val, _ = rpn.expand(val)
 	}
 	a := fromJSON(val)
@@ -130,7 +127,7 @@ func (rpn *Rpn) equals() error {
 	if fromJSON(a) == nil {
 		a, _ = rpn.expand(a)
 	}
-	
+
 	rpn.push(fmt.Sprintf("%t", a == b))
 	return nil
 }
