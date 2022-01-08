@@ -46,6 +46,9 @@ func ReadCard(filename string) (Card, error) {
 	}
 
 	card.Contents = string(contents)
+	if strings.Contains(card.Contents, "\r\n") {
+		card.Contents = strings.Replace(card.Contents, "\r\n", "\n", -1)
+	}
 	card.Frontmatter = frontmatter.HasFrontmatter(card.Contents)
 
 	properties, err := frontmatter.UnmarshalFrontmatter(card.Contents)
