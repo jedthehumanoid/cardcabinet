@@ -22,9 +22,9 @@ func (rpn *Rpn) Eval(query string) error {
 			rpn.contains()
 		case "=":
 			rpn.equals()
-		case "&":
+		case "&", "AND":
 			rpn.and()
-		case "|":
+		case "|", "OR":
 			rpn.or()
 		default:
 			rpn.push(s)
@@ -32,27 +32,6 @@ func (rpn *Rpn) Eval(query string) error {
 	}
 	//	fmt.Println("FINISHED:", rpn.Stack)
 	return nil
-}
-
-func ExpandFromContext(s string, context string) string {
-	var ctx map[string]interface{}
-
-	err := json.Unmarshal([]byte(context), &ctx)
-	if err != nil {
-		panic(err)
-	}
-
-	slice := []string{}
-	for _, token := range Split(s) {
-		value, exists := ctx[token]
-		if exists {
-			slice = append(slice, toJSON(value))
-		} else {
-			slice = append(slice, token)
-		}
-	}
-
-	return strings.Join(slice, " ")
 }
 
 // typeOf only exists because of type switching a slice returns []interface{}
@@ -70,15 +49,6 @@ func (rpn *Rpn) pop() (string, error) {
 	val := rpn.Stack[len-1]
 	rpn.Stack = rpn.Stack[:len-1]
 	return val, nil
-}
-
-func (rpn *Rpn) popVal() (interface{}, error) {
-	j, err := rpn.pop()
-	if err != nil {
-		return nil, err
-	}
-	return fromJSON(j), nil
-
 }
 
 func (rpn *Rpn) push(value string) error {
@@ -133,15 +103,19 @@ func (rpn *Rpn) equals() error {
 }
 
 func (rpn *Rpn) or() error {
-	b, _ := rpn.popVal()
-	a, _ := rpn.popVal()
+	val, _ := rpn.pop()
+	b := fromJSON(val)
+	val, _ = rpn.pop()
+	a := fromJSON(val)
 	rpn.push(fmt.Sprintf("%t", a.(bool) || b.(bool)))
 	return nil
 }
 
 func (rpn *Rpn) and() error {
-	b, _ := rpn.popVal()
-	a, _ := rpn.popVal()
+	val, _ := rpn.pop()
+	b := fromJSON(val)
+	val, _ = rpn.pop()
+	a := fromJSON(val)
 	rpn.push(fmt.Sprintf("%t", a.(bool) && b.(bool)))
 	return nil
 }

@@ -255,36 +255,4 @@ func TestPop(t *testing.T) {
 	if val != `"foo"` {
 		t.Errorf("Expected to have popped \"foo\"")
 	}
-
-}
-
-func TestPopVal(t *testing.T) {
-	rpn := Rpn{}
-	rpn.push(`"foo"`)
-	rpn.push(`"bar"`)
-
-	val, err := rpn.popVal()
-	if err != nil {
-		panic(err)
-	}
-
-	if val != "bar" {
-		t.Errorf("%s", val)
-		t.Errorf("Expected to have popped \"bar\"")
-	}
-}
-
-func TestExpandFromContext(t *testing.T) {
-
-	context := `{
-		"name": "jack",
-		"labels": ["dull", "boy"]
-	}`
-
-	result := ExpandFromContext(`name "jack" = labels "dull" boy ... "name" "labels"`, context)
-	expected := `"jack" "jack" = ["dull","boy"] "dull" boy ... "name" "labels"`
-
-	if result != expected {
-		t.Errorf("unexpected value: %s, expected: %s", result, expected)
-	}
 }
