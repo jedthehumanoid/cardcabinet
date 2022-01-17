@@ -1,12 +1,13 @@
 package cardcabinet
 
 import (
-	"github.com/jedthehumanoid/cardcabinet/frontmatter"
-	"github.com/jedthehumanoid/cardcabinet/rpn"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/jedthehumanoid/cardcabinet/frontmatter"
+	"github.com/jedthehumanoid/cardcabinet/rpn"
 )
 
 // Card is markdown with properties (from frontmatter).
@@ -29,6 +30,9 @@ func (card Card) Path() string {
 }
 
 func (card Card) Match(filter string) bool {
+	if filter == "" {
+		return true
+	}
 	rpn := rpn.Rpn{}
 	rpn.Variables = card.Properties
 	rpn.Eval(filter)
