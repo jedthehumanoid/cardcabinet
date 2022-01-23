@@ -48,6 +48,9 @@ func typeOf(i interface{}) string {
 
 func (rpn *Rpn) pop() (string, error) {
 	len := len(rpn.Stack)
+	if len < 1 {
+		return "", fmt.Errorf("stack underflow")
+	}
 	val := rpn.Stack[len-1]
 	rpn.Stack = rpn.Stack[:len-1]
 	return val, nil
@@ -120,8 +123,18 @@ func (rpn *Rpn) equals() error {
 func (rpn *Rpn) or() error {
 	val, _ := rpn.pop()
 	b := fromJSON(val)
+	switch b.(type) {
+	case bool:
+	default:
+		return fmt.Errorf("not bool")
+	}
 	val, _ = rpn.pop()
 	a := fromJSON(val)
+	switch a.(type) {
+	case bool:
+	default:
+		return fmt.Errorf("not bool")
+	}
 	rpn.push(fmt.Sprintf("%t", a.(bool) || b.(bool)))
 	return nil
 }
@@ -129,8 +142,18 @@ func (rpn *Rpn) or() error {
 func (rpn *Rpn) and() error {
 	val, _ := rpn.pop()
 	b := fromJSON(val)
+	switch b.(type) {
+	case bool:
+	default:
+		return fmt.Errorf("not bool")
+	}
 	val, _ = rpn.pop()
 	a := fromJSON(val)
+	switch a.(type) {
+	case bool:
+	default:
+		return fmt.Errorf("not bool")
+	}
 	rpn.push(fmt.Sprintf("%t", a.(bool) && b.(bool)))
 	return nil
 }
