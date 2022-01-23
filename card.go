@@ -34,9 +34,33 @@ func (card Card) Match(filter string) bool {
 		return true
 	}
 	rpn := rpn.Rpn{}
+
+	// kändes som att det här inverkade på prestandan?
+	//context := card.Properties
+
+	//	_, hasname := context["name"]
+	//	if !hasname {
+	//		context["name"] = card.Name
+	//	}
 	rpn.Variables = card.Properties
 	rpn.Eval(filter)
-	return len(rpn.Stack) == 1 && rpn.Stack[0] == "true"
+
+	if len(rpn.Stack) == 0 {
+		return false
+	}
+
+	if len(rpn.Stack) == 1 {
+		return rpn.Stack[0] == "true"
+	}
+
+	// If all values in stack are true, treat it as
+	// several queries and default to and between them
+	for _, val := range rpn.Stack {
+		if val != "true" {
+			return false
+		}
+	}
+	return true
 }
 
 // ReadCard takes a file path, reading file in to a card.
@@ -60,6 +84,9 @@ func ReadCard(filename string) (Card, error) {
 		return card, err
 	}
 	card.Properties = properties
+	if card.Properties == nil {
+		card.Properties = map[string]interface{}{}
+	}
 	card.Contents = frontmatter.RemoveFrontmatter(card.Contents)
 	return card, nil
 }
