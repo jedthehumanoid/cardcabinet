@@ -26,6 +26,8 @@ func (rpn *Rpn) Eval(query string) error {
 			rpn.and()
 		case "|", "OR":
 			rpn.or()
+		case "!", "NOT":
+			rpn.not()
 		default:
 			rpn.push(s)
 		}
@@ -61,7 +63,20 @@ func (rpn *Rpn) expand(s string) (string, error) {
 	if exists {
 		return toJSON(value), nil
 	}
-	return "", fmt.Errorf("Missing variable: %s", s)
+	return "", fmt.Errorf("missing variable: %s", s)
+}
+
+func (rpn *Rpn) not() error {
+	val, _ := rpn.pop()
+	a := fromJSON(val)
+	switch a.(type) {
+	case bool:
+	default:
+		return fmt.Errorf("not bool")
+	}
+	rpn.push(fmt.Sprintf("%t", !a.(bool)))
+	return nil
+
 }
 
 func (rpn *Rpn) contains() error {
