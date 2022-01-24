@@ -74,9 +74,8 @@ func ReadCard(filename string) (Card, error) {
 	}
 
 	card.Contents = string(contents)
-	if strings.Contains(card.Contents, "\r\n") {
-		card.Contents = strings.Replace(card.Contents, "\r\n", "\n", -1)
-	}
+	card.Contents = strings.Replace(card.Contents, "\r\n", "\n", -1)
+
 	card.Frontmatter = frontmatter.HasFrontmatter(card.Contents)
 
 	properties, err := frontmatter.UnmarshalFrontmatter(card.Contents)
@@ -104,12 +103,11 @@ func ReadCards(dir string, recursive bool) []Card {
 		if !strings.HasSuffix(file, ".md") {
 			continue
 		}
-		card, err := ReadCard(file)
-		if err != nil {
-			panic(err)
+		card, _ := ReadCard(file)
+		if err == nil {
+			cards = append(cards, card)
 		}
 
-		cards = append(cards, card)
 	}
 	// mfr Map cards, cards
 	for i := range cards {
