@@ -12,6 +12,17 @@ type Rpn struct {
 	Stack     []string
 }
 
+type constError string
+
+func (err constError) Error() string {
+	return string(err)
+}
+
+const (
+	ErrStackUnderflow = constError("stack underflow")
+	ErrWrongType      = constError("wrong type")
+)
+
 func (rpn *Rpn) Eval(query string) error {
 	//fmt.Println("EVAL:", query)
 	//	fmt.Println("Variables: ", rpn.Variables)
@@ -49,7 +60,7 @@ func typeOf(i interface{}) string {
 func (rpn *Rpn) pop() (string, error) {
 	len := len(rpn.Stack)
 	if len < 1 {
-		return "", fmt.Errorf("stack underflow")
+		return "", ErrStackUnderflow
 	}
 	val := rpn.Stack[len-1]
 	rpn.Stack = rpn.Stack[:len-1]
@@ -75,7 +86,7 @@ func (rpn *Rpn) not() error {
 	switch a.(type) {
 	case bool:
 	default:
-		return fmt.Errorf("not bool")
+		return ErrWrongType
 	}
 	rpn.push(fmt.Sprintf("%t", !a.(bool)))
 	return nil
@@ -107,13 +118,32 @@ func (rpn *Rpn) contains() error {
 }
 
 func (rpn *Rpn) equals() error {
-	b, _ := rpn.pop()
-	if fromJSON(b) == nil {
-		b, _ = rpn.expand(b)
+	fmt.Println("equals", rpn.Stack)
+	b, err := rpn.pop()
+	if err != nil {
+		return err
 	}
-	a, _ := rpn.pop()
+	a, err := rpn.pop()
+	if err != nil {
+		return err
+	}
+	if fromJSON(b) == nil {
+		b, err = rpn.expand(b)
+		if err != nil {
+			fmt.Println("cannot expand b")
+
+			rpn.push(fmt.Sprintf("%t", false))
+			return nil
+		}
+	}
+
 	if fromJSON(a) == nil {
-		a, _ = rpn.expand(a)
+		a, err = rpn.expand(a)
+		if err != nil {
+			fmt.Println("cannot expand a")
+			rpn.push(fmt.Sprintf("%t", false))
+			return nil
+		}
 	}
 
 	rpn.push(fmt.Sprintf("%t", a == b))
@@ -126,14 +156,14 @@ func (rpn *Rpn) or() error {
 	switch b.(type) {
 	case bool:
 	default:
-		return fmt.Errorf("not bool")
+		return ErrWrongType
 	}
 	val, _ = rpn.pop()
 	a := fromJSON(val)
 	switch a.(type) {
 	case bool:
 	default:
-		return fmt.Errorf("not bool")
+		return ErrWrongType
 	}
 	rpn.push(fmt.Sprintf("%t", a.(bool) || b.(bool)))
 	return nil
@@ -145,14 +175,14 @@ func (rpn *Rpn) and() error {
 	switch b.(type) {
 	case bool:
 	default:
-		return fmt.Errorf("not bool")
+		return ErrWrongType
 	}
 	val, _ = rpn.pop()
 	a := fromJSON(val)
 	switch a.(type) {
 	case bool:
 	default:
-		return fmt.Errorf("not bool")
+		return ErrWrongType
 	}
 	rpn.push(fmt.Sprintf("%t", a.(bool) && b.(bool)))
 	return nil
