@@ -2,7 +2,9 @@ package cardcabinet
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 	//	"fmt"
@@ -16,6 +18,7 @@ func TestReadCard(t *testing.T) {
 	}{
 		{"testdata/card.md", "testdata/card.json"},
 		{"testdata/wonky-middlematter.md", "testdata/wonky-middlematter.json"},
+		{"testdata/without-frontmatter.md", "testdata/without-frontmatter.json"},
 	}
 
 	for _, tc := range tt {
@@ -32,6 +35,14 @@ func TestReadCard(t *testing.T) {
 	}
 }
 
+func TestReadCardNonexistent(t *testing.T) {
+	_, err := ReadCard("empty/this-card-does-not-exist.md")
+	if !errors.Is(err, os.ErrNotExist) {
+		t.Errorf("Expected not exist error")
+	}
+
+}
+
 func TestReadCards(t *testing.T) {
 	cards := ReadCards("testdata/", false)
 
@@ -41,7 +52,7 @@ func TestReadCards(t *testing.T) {
 	}
 	result := toJSON(c)
 
-	expected := toJSON([]string{"add-magnets.md", "card.md", "types.md", "wonky-middlematter.md"})
+	expected := toJSON([]string{"add-magnets.md", "card.md", "types.md", "without-frontmatter.md", "wonky-middlematter.md"})
 
 	if result != expected {
 		t.Errorf("unexpected result, got: %s, expected: %s", result, expected)
@@ -67,6 +78,9 @@ func TestMatch(t *testing.T) {
 		{`labels "todo" ... labels "jobb" ... |`, "add-magnets.md", true},
 		{`labels "todo"... labels "test" ... &`, "add-magnets.md", true},
 		{`assignee "Ture Sventton" =`, "add-magnets.md", true},
+		{``, "add-magnets.md", true},
+		{`labels "todo"... labels "test" ...`, "add-magnets.md", true},
+		{`labels "todo"... labels "foo" ...`, "add-magnets.md", false},
 	}
 
 	for _, tc := range tt {
@@ -81,5 +95,15 @@ func TestMatch(t *testing.T) {
 			}
 
 		})
+	}
+
+}
+
+func TestGetPath(t *testing.T) {
+	card, _ := ReadCard("testdata/card.md")
+	expected := "testdata/"
+
+	if card.Path() != expected {
+		t.Errorf("unexpected result, %s != %s", card.Path(), expected)
 	}
 }

@@ -85,6 +85,26 @@ func TestEvalAnd(t *testing.T) {
 	if rpn.Stack[0] != "false" {
 		t.Errorf("expected result to be false")
 	}
+
+	// Wrong types
+
+	rpn = Rpn{}
+	rpn.push("1")
+	rpn.push("false")
+
+	err = rpn.and()
+	if err != ErrWrongType {
+		t.Errorf("expected wrong type error")
+	}
+
+	rpn = Rpn{}
+	rpn.push("false")
+	rpn.push("1")
+
+	err = rpn.and()
+	if err != ErrWrongType {
+		t.Errorf("expected wrong type error")
+	}
 }
 
 func TestEvalOr(t *testing.T) {
@@ -126,6 +146,65 @@ func TestEvalOr(t *testing.T) {
 	if rpn.Stack[0] != "false" {
 		t.Errorf("expected result to be false")
 	}
+
+	// Wrong types
+
+	rpn = Rpn{}
+	rpn.push("1")
+	rpn.push("false")
+
+	err = rpn.or()
+	if err != ErrWrongType {
+		t.Errorf("expected wrong type error")
+	}
+
+	rpn = Rpn{}
+	rpn.push("false")
+	rpn.push("1")
+
+	err = rpn.or()
+	if err != ErrWrongType {
+		t.Errorf("expected wrong type error")
+	}
+}
+
+func TestEvalNot(t *testing.T) {
+	rpn := Rpn{}
+	err := rpn.Eval("true !")
+	if err != nil {
+		t.Errorf("expected nil")
+	}
+	if len(rpn.Stack) != 1 {
+		t.Errorf("expected stack to have one value, %v", rpn)
+	}
+
+	if rpn.Stack[0] != "false" {
+		t.Errorf("expected result to be false")
+	}
+
+	rpn = Rpn{}
+	err = rpn.Eval("false !")
+	if err != nil {
+		t.Errorf("expected nil")
+	}
+	if len(rpn.Stack) != 1 {
+		t.Errorf("expected stack to have one value, %v", rpn)
+	}
+
+	if rpn.Stack[0] != "true" {
+		t.Errorf("expected result to be true")
+	}
+	rpn = Rpn{}
+	rpn.push("1")
+	err = rpn.not()
+	if err != ErrWrongType {
+		t.Errorf("expected wrong type error")
+	}
+	if len(rpn.Stack) != 0 {
+		t.Errorf("expected stack to be empty, %v", rpn)
+		//TODO: are we really?
+	}
+
 }
 
 func TestEvalContainsWithSlice(t *testing.T) {
@@ -205,6 +284,24 @@ func TestEvalEqual(t *testing.T) {
 		t.Errorf("expected stack to have false, had %v", rpn.Stack)
 	}
 
+	rpn = Rpn{}
+	err = rpn.Eval("foo 3 =")
+	if err != nil {
+		t.Errorf("expected nil")
+	}
+	if !(len(rpn.Stack) == 1 && rpn.Stack[0] == "false") {
+		t.Errorf("expected stack to have false, had %v", rpn.Stack)
+	}
+
+	rpn = Rpn{}
+	err = rpn.Eval("foo bar =")
+	if err != nil {
+		t.Errorf("expected nil")
+	}
+	if !(len(rpn.Stack) == 1 && rpn.Stack[0] == "false") {
+		t.Errorf("expected stack to have false, had %v", rpn.Stack)
+	}
+
 }
 
 func TestSplit(t *testing.T) {
@@ -254,5 +351,14 @@ func TestPop(t *testing.T) {
 	}
 	if val != `"foo"` {
 		t.Errorf("Expected to have popped \"foo\"")
+	}
+
+	rpn = Rpn{}
+	val, err = rpn.pop()
+	if err != ErrStackUnderflow {
+		t.Errorf("Expected stack underflow error")
+	}
+	if val != "" {
+		t.Errorf("Expected value to be empty")
 	}
 }
