@@ -118,7 +118,6 @@ func (rpn *Rpn) contains() error {
 }
 
 func (rpn *Rpn) equals() error {
-	fmt.Println("equals", rpn.Stack)
 	b, err := rpn.pop()
 	if err != nil {
 		return err
@@ -130,8 +129,6 @@ func (rpn *Rpn) equals() error {
 	if fromJSON(b) == nil {
 		b, err = rpn.expand(b)
 		if err != nil {
-			fmt.Println("cannot expand b")
-
 			rpn.push(fmt.Sprintf("%t", false))
 			return nil
 		}
@@ -140,7 +137,6 @@ func (rpn *Rpn) equals() error {
 	if fromJSON(a) == nil {
 		a, err = rpn.expand(a)
 		if err != nil {
-			fmt.Println("cannot expand a")
 			rpn.push(fmt.Sprintf("%t", false))
 			return nil
 		}
