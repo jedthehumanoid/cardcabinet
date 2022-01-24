@@ -2,14 +2,15 @@ package frontmatter
 
 import (
 	"bytes"
-	"github.com/BurntSushi/toml"
-	yaml "gopkg.in/yaml.v2"
 	"regexp"
 	"strings"
+
+	"github.com/BurntSushi/toml"
+	yaml "gopkg.in/yaml.v2"
 )
 
-var yamlregexp = regexp.MustCompile("(?ms)\\A\\s*?---([\\s\\S]*?)^---$")
-var tomlregexp = regexp.MustCompile("(?ms)\\A\\s*?\\+\\+\\+([\\s\\S]*?)^\\+\\+\\+$")
+var yamlregexp = regexp.MustCompile(`(?ms)\A\s*?---([\s\S]*?)^---$`)
+var tomlregexp = regexp.MustCompile(`(?ms)\A\s*?\+\+\+([\s\S]*?)^\+\+\+$`)
 
 func HasFrontmatter(s string) string {
 	match := yamlregexp.FindStringSubmatch(s)
